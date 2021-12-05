@@ -1,17 +1,25 @@
 #include "VarContext.h"
 
-void VarContext::add(char t, const QString &&name, const Token &value) {
+void VarContext::add(char t, const QString &name, const Token &value) {
     _vars.insert(name, Var{t, value});
 }
 
 char VarContext::exists(const QString &name) {
-    return _vars.contains(name);
+    return _vars.contains(name) ? _vars[name].t : 0;
 }
 
-Token VarContext::operator[](const QString &name) {
+Token VarContext::singleVar(const QString &name) {
     return _vars[name].value;
 }
 
 VarContext::VarContext(const VarContext &other) noexcept {
     _vars = other._vars;
+}
+
+void VarContext::add(char t, const QString &name, const QList<Token> &value) {
+    _vars.insert(name,Var{t,{},value});
+}
+
+QList<Token> VarContext::expressionVar(const QString &name) {
+    return _vars[name].expressionValue;
 }

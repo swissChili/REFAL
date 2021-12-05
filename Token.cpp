@@ -16,18 +16,13 @@ Token::Token(QString &&identifier) {
 
 Token::Token(QList<Token> &&parenthesized) {
     _type = PAREN;
-    _listVal = new QList<Token>(parenthesized);
+    _listVal = parenthesized;
 }
 
 Token::Token(char varType, const QString &&name) {
     _type = VAR;
     _charVal = varType;
     _stringVal = name;
-}
-
-Token::~Token() {
-    // Стерать нулевые пойнтеры безопасно
-    delete _listVal;
 }
 
 bool Token::isSym() {
@@ -49,17 +44,29 @@ bool Token::isVar() {
 Token::Token() : Token("Null") {
 }
 
-bool Token::operator==(const Token &other) {
+bool Token::operator==(const Token &other) const {
     return _type == other._type
            && _stringVal == other._stringVal
            && _charVal == other._charVal
-           && (_listVal == nullptr || *_listVal == (*other._listVal));
+           && _listVal == other._listVal;
 }
 
 QList<Token> Token::parenContent() {
-    if (isParen() && _listVal) {
-        return *_listVal;
+    if (isParen()) {
+        return _listVal;
     } else {
         return {};
     }
+}
+
+char Token::varType() const {
+    return _charVal.toLatin1();
+}
+
+const QString &Token::name() const {
+    return _stringVal;
+}
+
+bool Token::operator!=(const Token &other) const {
+    return !(this->operator==(other));
 }

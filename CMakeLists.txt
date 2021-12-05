@@ -16,3 +16,4 @@ target_link_libraries(REFAL
         Qt::Core
         )
 
+add_compile_options("-fsanitize=address")
