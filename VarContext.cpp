@@ -23,3 +23,22 @@ void VarContext::add(char t, const QString &name, const QList<Token> &value) {
 QList<Token> VarContext::expressionVar(const QString &name) {
     return _vars[name].expressionValue;
 }
+
+QDebug &operator <<(QDebug &debug, const VarContext &ctx) {
+    for (const auto &name: ctx._vars.keys()) {
+        char t = ctx._vars[name].t;
+        auto d = debug.nospace().noquote() << t << '.' << name << ":";
+
+        if (t != 'e')
+            d.nospace() << "( " << ctx._vars[name].value << " )";
+        else
+            d << "( " << ctx._vars[name].expressionValue << " )";
+        d << "; ";
+    }
+
+    if (ctx._vars.empty()) {
+        debug << "{}";
+    }
+
+    return debug;
+}

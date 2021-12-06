@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMap>
+#include <QDebug>
 #include "Token.h"
 
 class VarContext {
@@ -15,6 +16,8 @@ public:
     Token singleVar(const QString &name);
     QList<Token> expressionVar(const QString &name);
 
+    friend QDebug &operator <<(QDebug &debug, const VarContext &ctx);
+
 private:
     struct Var {
         Var() = default;
@@ -26,3 +29,5 @@ private:
 
     QMap<QString, Var> _vars;
 };
+
+QDebug &operator <<(QDebug &debug, const VarContext &ctx);

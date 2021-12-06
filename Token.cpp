@@ -1,5 +1,8 @@
 #include "Token.h"
 
+#include <QDebug>
+#include <utility>
+
 Token::Token(const Token &other) {
     *this = other;
 }
@@ -14,9 +17,9 @@ Token::Token(QString &&identifier) {
     _stringVal = identifier;
 }
 
-Token::Token(QList<Token> &&parenthesized) {
+Token::Token(QList<Token> parenthesized) {
     _type = PAREN;
-    _listVal = parenthesized;
+    _listVal = std::move(parenthesized);
 }
 
 Token::Token(char varType, const QString &&name) {
@@ -25,19 +28,19 @@ Token::Token(char varType, const QString &&name) {
     _stringVal = name;
 }
 
-bool Token::isSym() {
+bool Token::isSym() const {
     return _type == SYM;
 }
 
-bool Token::isIdent() {
+bool Token::isIdent() const {
     return _type == IDENT;
 }
 
-bool Token::isParen() {
+bool Token::isParen() const {
     return _type == PAREN;
 }
 
-bool Token::isVar() {
+bool Token::isVar() const {
     return _type == VAR;
 }
 
@@ -69,4 +72,32 @@ const QString &Token::name() const {
 
 bool Token::operator!=(const Token &other) const {
     return !(this->operator==(other));
+}
+
+Token::operator QString() const {
+    if (isIdent())
+        return _stringVal;
+    if (isSym())
+        return _charVal;
+    if (isVar())
+        return QString(_charVal) + "." + _stringVal;
+    if (isParen()) {
+        QStringList parts;
+        for (const Token &tok : _listVal) {
+            parts.append(static_cast<QString>(tok));
+        }
+
+        return "(" + parts.join(" ") + ")";
+    }
+
+    return "Null";
+}
+
+int Token::type() const {
+    return _type;
+}
+
+QString Token::typeToString(int type)  {
+    static const QString typeNames[] = {"SYMBOL", "IDENT", "PAREN", "VAR"};
+    return typeNames[type];
 }

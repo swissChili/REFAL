@@ -18,9 +18,15 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context) {
         } else {
             return MatchResult{false, context};
         }
-    } else if (ph.isParen() && dataHead.isParen()) {
+    } else if (ph.isParen()) {
         data.removeFirst();
+
+        qDebug() << "parens, dh = " << dataHead;
+        qDebug() << "Matching parens" << dataHead.parenContent() << ph.parenContent();
+
         auto result = match(dataHead.parenContent(), ph.parenContent(), context);
+
+        qDebug() << "parens result was" << result.success << "in ctx" << result.context;
 
         if (result.success) {
             return match(data, pattern, result.context);
@@ -86,6 +92,10 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context) {
                         // else matchSyms ++
                     }
                     // If this worked we would have returned already
+                    return MatchResult{false, context};
+
+                default:
+                    qDebug() << "#TYPE_ERROR";
                     return MatchResult{false, context};
             }
         }
