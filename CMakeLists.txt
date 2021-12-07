@@ -11,7 +11,7 @@ find_package(Qt5 COMPONENTS
         Core
         REQUIRED)
 
-add_executable(REFAL main.cpp Token.cpp Token.h Matcher.cpp Matcher.h VarContext.cpp VarContext.h)
+add_executable(REFAL main.cpp Token.cpp Token.h Matcher.cpp Matcher.h VarContext.cpp VarContext.h Parser.cpp Parser.h AstNode.cpp AstNode.h)
 target_link_libraries(REFAL
         Qt::Core
         )

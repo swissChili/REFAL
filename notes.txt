@@ -1,0 +1,8 @@
+export QT_LOGGING_RULES="*.debug=true"
+
+
+OPTIMIZATION POSSIBILITIES:
+
+	When parsing e.* variables check the min length of the remaining tokens. If
+	we have `e.1 s.2' for instance, we can tell right away how long `e.1' wil
+	have to be.
