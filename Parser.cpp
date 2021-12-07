@@ -213,3 +213,70 @@ bool Parser::parseOne<AstNode>(AstNode *node)
            parseSymbol(node) ||
            parseParens(node);
 }
+
+bool Parser::parseSentence(Sentence *sentence)
+{
+    int pos = _pos;
+
+    QList<Token> pattern = parseMany<Token>();
+
+    skip();
+
+    if (get() != '=')
+    {
+        _pos = pos;
+        return false;
+    }
+
+    QList<AstNode> result = parseMany<AstNode>();
+
+    skip();
+
+    if (get() != ';')
+    {
+        _pos = pos;
+        return false;
+    }
+
+    *sentence = Sentence(pattern, result);
+    return true;
+}
+
+bool Parser::parseFunctionDefinition(Function *function)
+{
+    int pos = _pos;
+
+    Token identifier;
+    if (!parseIdentifier(&identifier))
+    {
+        _pos = pos;
+        return false;
+    }
+
+    QString name = identifier.name();
+    Function func(name);
+
+    skip();
+
+    if (get() != '{')
+    {
+        _pos = pos;
+        return false;
+    }
+
+    Sentence sentence;
+    while (parseSentence(&sentence))
+    {
+        func.addSentence(sentence);
+        skip();
+    }
+
+    if (get() != '}')
+    {
+        _pos = pos;
+        return false;
+    }
+
+    *function = func;
+    return true;
+}

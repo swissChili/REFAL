@@ -42,6 +42,25 @@ void testParseAst(QString string)
     qDebug() << "\033[36mParse\033[0m" << string << result;
 }
 
+void testParseFunc(QString string)
+{
+    Parser parser{string};
+
+    Function func;
+
+    if (!parser.parseFunctionDefinition(&func))
+    {
+        g_numFailed++;
+        qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+        qDebug() << string;
+    }
+    else
+    {
+        qDebug() << "\033[36mFunction\033[0m";
+        qDebug().noquote() << func;
+    }
+}
+
 int testResults()
 {
     if (g_numFailed == 0)
@@ -109,6 +128,14 @@ void testAllParses()
     testParseAst("(<Prout hi>)");
     testParseAst("<If T Then (<Prout hi>) Else (<Prout sorry>)>");
     testParseAst("(s.a) e.Middle s.a");
+    testParseAst("Hello; Goodbye");
+    testParseAst("Key = Value");
+}
+
+void testAllFunctionDefs()
+{
+    testParseFunc("Test { = HI; }");
+    testParseFunc("Palindrome { = T; s.A = T; s.A s.A = T; s.A e.Middle s.A = <Palindrome e.Middle>; } ");
 }
 
 int main(int argc, char *argv[])
@@ -118,6 +145,8 @@ int main(int argc, char *argv[])
     testAllMatches();
     qDebug() << "";
     testAllParses();
+    qDebug() << "";
+    testAllFunctionDefs();
 
     qDebug() << "";
     return testResults();

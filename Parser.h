@@ -4,6 +4,7 @@
 
 #include "Token.h"
 #include "AstNode.h"
+#include "Function.h"
 
 class Parser
 {
@@ -38,6 +39,9 @@ public:
 
     template <typename T>
     bool parseOne(T *node);
+
+    bool parseSentence(Sentence *sentence);
+    bool parseFunctionDefinition(Function *function);
 
 private:
     int _pos = 0;
