@@ -27,6 +27,7 @@ public:
 
     char varType() const;
     const QString &name() const;
+    QChar symbol() const;
 
     operator QString() const;
 
@@ -195,4 +196,10 @@ QString TokenBase<T>::typeToString(int type)
 {
     static const QString typeNames[] = {"SYMBOL", "IDENT", "PAREN", "VAR"};
     return typeNames[type];
+}
+
+template <typename T>
+QChar TokenBase<T>::symbol() const
+{
+    return _charVal;
 }

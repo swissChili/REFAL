@@ -25,11 +25,19 @@ void testMatch(const QString &test, bool shouldBe, const MatchResult &result)
     }
 }
 
-void testParse(QString string)
+void testMatch(QString data, QString pattern, bool shouldBe = true)
+{
+    Parser dataParser(data),
+        patternParser(pattern);
+
+    testMatch(pattern + " = " + data, shouldBe, match(dataParser.parseMany<Token>(), patternParser.parseMany<Token>(), VarContext()));
+}
+
+void testParseAst(QString string)
 {
     Parser parser{string};
 
-    QList<AstNode> result = parser.parseMany();
+    QList<AstNode> result = parser.parseMany<AstNode>();
 
     qDebug() << "\033[36mParse\033[0m" << string << result;
 }
@@ -84,22 +92,23 @@ void testAllMatches()
 
     testMatch("(s.a) e.Middle s.a = (y)f MiddleStuff y", true,
                 match(parenTest1, parenthesized, VarContext()));
+    // testMatch("(y)f Middle-stuff y", "(s.a) e.Middle s.a");
 
-    testMatch("(a) = (a)", true,
-                match({Token({Token('a')})}, {Token({Token('a')})}, VarContext()));
+    testMatch("(a)", "(a)");
 }
 
 void testAllParses()
 {
-    testParse("all symbols");
-    testParse("Identifier symbols Identifier");
-    testParse("s.A");
-    testParse("(s.A) Variable-quoted");
-    testParse("<Func-name a b (c)>");
-    testParse("<Prout hi>");
-    testParse("(Prout hi)");
-    testParse("(<Prout hi>)");
-    testParse("<If T Then (<Prout hi>) Else (<Prout sorry>)>");
+    testParseAst("all symbols");
+    testParseAst("Identifier symbols Identifier");
+    testParseAst("s.A");
+    testParseAst("(s.A) Variable-quoted");
+    testParseAst("<Func-name a b (c)>");
+    testParseAst("<Prout hi>");
+    testParseAst("(Prout hi)");
+    testParseAst("(<Prout hi>)");
+    testParseAst("<If T Then (<Prout hi>) Else (<Prout sorry>)>");
+    testParseAst("(s.a) e.Middle s.a");
 }
 
 int main(int argc, char *argv[])

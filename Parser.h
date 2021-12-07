@@ -2,6 +2,7 @@
 
 #include <QString>
 
+#include "Token.h"
 #include "AstNode.h"
 
 class Parser
@@ -15,16 +16,36 @@ public:
 
     void skip();
 
-    bool parseSymbol(AstNode *node);
-    bool parseIdentifier(AstNode *node);
-    bool parseNumber(AstNode *node);
-    bool parseVariable(AstNode *node);
-    bool parseParens(AstNode *node);
+    template <typename T>
+    bool parseSymbol(T *node);
+
+    template <typename T>
+    bool parseIdentifier(T *node);
+
+    template <typename T>
+    bool parseNumber(T *node);
+
+    template <typename T>
+    bool parseVariable(T *node);
+
+    template <typename T>
+    bool parseParens(T *node);
+
     bool parseFunction(AstNode *node);
-    QList<AstNode> parseMany();
-    bool parseOne(AstNode *node);
+
+    template <typename T>
+    QList<T> parseMany();
+
+    template <typename T>
+    bool parseOne(T *node);
 
 private:
     int _pos = 0;
     QString _input;
 };
+
+template <>
+bool Parser::parseOne<Token>(Token *node);
+
+template <>
+bool Parser::parseOne<AstNode>(AstNode *node);

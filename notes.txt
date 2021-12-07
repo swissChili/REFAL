@@ -6,3 +6,12 @@ OPTIMIZATION POSSIBILITIES:
 	When parsing e.* variables check the min length of the remaining tokens. If
 	we have `e.1 s.2' for instance, we can tell right away how long `e.1' wil
 	have to be.
+
+
+EVALUATION
+
+	There are several parts to evaluation:
+
+	- Pattern matching and delegation (which sentence of a function do we choose to evaluate)
+	- Expression evaluation (how do we expand an AstNode stream into a Token stream)
+	

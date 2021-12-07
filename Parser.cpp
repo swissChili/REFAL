@@ -31,20 +31,22 @@ void Parser::skip()
         get();
 }
 
-bool Parser::parseSymbol(AstNode *node)
+template <typename T>
+bool Parser::parseSymbol(T *node)
 {
     skip();
 
     if (peek().isLetter())
     {
-        *node = AstNode(get());
+        *node = T(get());
         return true;
     }
 
     return false;
 }
 
-bool Parser::parseIdentifier(AstNode *node)
+template <typename T>
+bool Parser::parseIdentifier(T *node)
 {
     skip();
 
@@ -57,14 +59,15 @@ bool Parser::parseIdentifier(AstNode *node)
             buffer += get();
         }
 
-        *node = AstNode(buffer);
+        *node = T(buffer);
         return true;
     }
 
     return false;
 }
 
-bool Parser::parseNumber(AstNode *node)
+template <typename T>
+bool Parser::parseNumber(T *node)
 {
     skip();
 
@@ -75,14 +78,15 @@ bool Parser::parseNumber(AstNode *node)
         while (peek().isDigit())
             buffer += get();
 
-        *node = AstNode(buffer.toInt());
+        *node = T(buffer.toInt());
         return true;
     }
 
     return false;
 }
 
-bool Parser::parseVariable(AstNode *node)
+template <typename T>
+bool Parser::parseVariable(T *node)
 {
     skip();
 
@@ -96,11 +100,16 @@ bool Parser::parseVariable(AstNode *node)
         {
             get();
 
-            AstNode identNode;
+            T nameNode;
 
-            if (parseIdentifier(&identNode))
+            if (parseIdentifier(&nameNode))
             {
-                *node = AstNode(type, identNode.name());
+                *node = T(type, nameNode.name());
+                return true;
+            }
+            else if (parseSymbol(&nameNode))
+            {
+                *node = T(type, QString(nameNode.symbol()));
                 return true;
             }
         }
@@ -110,20 +119,11 @@ bool Parser::parseVariable(AstNode *node)
     return false;
 }
 
-bool Parser::parseOne(AstNode *node)
+template <typename T>
+QList<T> Parser::parseMany()
 {
-    return parseFunction(node) ||
-           parseVariable(node) ||
-           parseNumber(node) ||
-           parseIdentifier(node) ||
-           parseSymbol(node) ||
-           parseParens(node);
-}
-
-QList<AstNode> Parser::parseMany()
-{
-    QList<AstNode> nodes;
-    AstNode next;
+    QList<T > nodes;
+    T next;
 
     while (parseOne(&next))
     {
@@ -133,7 +133,8 @@ QList<AstNode> Parser::parseMany()
     return nodes;
 }
 
-bool Parser::parseParens(AstNode *node)
+template <typename T>
+bool Parser::parseParens(T *node)
 {
     skip();
 
@@ -144,8 +145,8 @@ bool Parser::parseParens(AstNode *node)
 
     get();
 
-    QList<AstNode> many = parseMany();
-    *node = AstNode(many);
+    QList<T> many = parseMany<T>();
+    *node = T(many);
 
     skip();
     if (peek() != ')')
@@ -177,7 +178,7 @@ bool Parser::parseFunction(AstNode *node)
         return false;
     }
 
-    QList<AstNode> body = parseMany();
+    QList<AstNode> body = parseMany<AstNode>();
     *node = AstNode(head.name(), body);
 
     skip();
@@ -190,4 +191,25 @@ bool Parser::parseFunction(AstNode *node)
     get();
 
     return true;
+}
+
+template <>
+bool Parser::parseOne<Token>(Token *node)
+{
+    return parseVariable(node) ||
+           parseNumber(node) ||
+           parseIdentifier(node) ||
+           parseSymbol(node) ||
+           parseParens(node);
+}
+
+template <>
+bool Parser::parseOne<AstNode>(AstNode *node)
+{
+    return parseFunction(node) ||
+           parseVariable(node) ||
+           parseNumber(node) ||
+           parseIdentifier(node) ||
+           parseSymbol(node) ||
+           parseParens(node);
 }

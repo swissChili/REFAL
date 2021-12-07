@@ -9,6 +9,11 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
         return MatchResult{true, context};
     }
 
+    if (pattern.empty() && !data.empty())
+    {
+        return MatchResult{false, context};
+    }
+
     Token ph = pattern.first();
     Token dataHead = data.first();
     pattern.removeFirst();
