@@ -1,4 +1,12 @@
-export QT_LOGGING_RULES="*.debug=true"
+SETUP
+
+	If you don't get console output from REFAL run:
+	export QT_LOGGING_RULES="*.debug=true"
+
+
+DEPENDENCIES
+
+	Install libedit-dev and libqt5core5a
 
 
 OPTIMIZATION POSSIBILITIES:
@@ -14,4 +22,3 @@ EVALUATION
 
 	- Pattern matching and delegation (which sentence of a function do we choose to evaluate)
 	- Expression evaluation (how do we expand an AstNode stream into a Token stream)
-	

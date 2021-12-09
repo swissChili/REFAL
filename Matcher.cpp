@@ -104,20 +104,23 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
                 return match(data, pattern, context);
 
             case 'e':
-                // Now this is tricky
-                // TODO: Optimize this to check if there is an obvious length that this expression has to be
-                for (int matchSyms = 1; matchSyms <= data.length(); matchSyms++)
+                // Now this is tricky TODO: Optimize this to check if
+                // there is an obvious length that this expression has
+                // to be
+                for (int matchSyms = 0; matchSyms <= data.length(); matchSyms++)
                 {
                     QList<Token> slice = listSlice(data, 0, matchSyms);
                     VarContext newContext = context;
                     newContext.add(ph.varType(), ph.name(), slice);
 
-                    MatchResult tryMatch = match(listSlice(data, matchSyms, data.length()), pattern, newContext);
+                    MatchResult tryMatch = match(
+						listSlice(data, matchSyms, data.length()),
+						pattern, newContext);
+
                     if (tryMatch.success)
                     {
                         return tryMatch;
                     }
-                    // else matchSyms ++
                 }
                 // If this worked we would have returned already
                 return MatchResult{false, context};
@@ -129,7 +132,7 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
         }
     }
 
-    qDebug() << "FALLING THROUGH, THIS SHOULD NOT HAPPEN";
+    qFatal("FALLING THROUGH, THIS SHOULD NOT HAPPEN");
     // Fallthrough
     return MatchResult{false, context};
 }

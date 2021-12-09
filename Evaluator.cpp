@@ -13,6 +13,7 @@ RuntimeResult::RuntimeResult(QList<Token> result)
 RuntimeResult::RuntimeResult(QString message)
 {
 	_errorMessage = message;
+	_success = false;
 }
 
 bool RuntimeResult::success() const

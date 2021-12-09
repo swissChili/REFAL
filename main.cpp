@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QCommandLineParser>
 #include <QDebug>
 
 #include "Matcher.h"
@@ -7,6 +8,7 @@
 #include "Parser.h"
 #include "Evaluator.h"
 #include "VarContext.h"
+#include "Repl.h"
 
 int g_numFailed = 0;
 
@@ -201,7 +203,7 @@ void testAllParses()
 void testAllFunctionDefs()
 {
     testParseFunc("Test { = HI; }");
-    testParseFunc("Palindrome { = T; s.A = T; s.A s.A = T; s.A e.Middle s.A = <Palindrome e.Middle>; e.Ignored = F; } ");
+    testParseFunc("Palindrome { = T; s.A = T; s.A e.Middle s.A = <Palindrome e.Middle>; e.Ignored = F; } ");
 }
 
 void testAllEvals()
@@ -212,15 +214,36 @@ void testAllEvals()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+	QCoreApplication::setApplicationName("REFAL");
+	QCoreApplication::setApplicationVersion("1.0-a1");
 
-    testAllMatches();
-    qDebug() << "";
-    testAllParses();
-    qDebug() << "";
-    testAllFunctionDefs();
-	qDebug() << "";
-	testAllEvals();
+	QCommandLineParser cli;
+	cli.setApplicationDescription("REFAL interpreter");
+	cli.addHelpOption();
+	cli.addVersionOption();
 
-    qDebug() << "";
-    return testResults();
+	QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite");
+	cli.addOption(testOption);
+
+	cli.process(a);
+
+	if (cli.isSet(testOption))
+	{
+		testAllMatches();
+		qDebug() << "";
+		testAllParses();
+		qDebug() << "";
+		testAllFunctionDefs();
+		qDebug() << "";
+		testAllEvals();
+
+		qDebug() << "";
+
+		return testResults();
+	}
+	else
+	{
+		Repl repl;
+		repl.start();
+	}
 }
