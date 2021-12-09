@@ -56,6 +56,10 @@ RuntimeResult Evaluator::evaluate(AstNode node, VarContext ctx)
 	{
 		return RuntimeResult(QList<Token>{Token(node.name())});
 	}
+	else if (node.isInteger())
+	{
+		return RuntimeResult(QList<Token>{Token::fromInteger(node.integer())});
+	}
 	else if (node.isVar())
 	{
 		if (!ctx.exists(node.name()) || ctx.exists(node.name()) != node.symbol())

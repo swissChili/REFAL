@@ -1,6 +1,8 @@
 #include "Token.h"
 #include "AstNode.h"
 
+#include <QDebug>
+
 template class TokenBase<Token>;
 
 // This is kind of ugly and breaks separation of concerns; but if I don't do
@@ -42,6 +44,17 @@ TokenBase<T>::TokenBase(QString integer, int base)
 {
 	_type = INTEGER;
 	_intVal = integer.toInt(nullptr, base);
+}
+
+template <typename T>
+T TokenBase<T>::fromInteger(int integer)
+{
+	T tok;
+
+	tok._type = INTEGER;
+	tok._intVal = integer;
+
+	return tok;
 }
 
 template <typename T>
@@ -89,7 +102,15 @@ TokenBase<T>::TokenBase() : TokenBase("Null")
 template <typename T>
 bool TokenBase<T>::operator==(const T &other) const
 {
-    return _type == other._type && _stringVal == other._stringVal && _charVal == other._charVal && _listVal == other._listVal;
+	// Why is this needed? Beats me.
+	if (isInteger() && other.isInteger())
+		return _intVal == other._intVal;
+
+    return _type == other._type &&
+		_stringVal == other._stringVal &&
+		_charVal == other._charVal &&
+		_listVal == other._listVal &&
+		_intVal == other._intVal;
 }
 
 template <typename T>

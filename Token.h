@@ -16,6 +16,8 @@ public:
     explicit TokenBase(QList<T> parenthesized);
     TokenBase(char varType, const QString name);
 
+	static T fromInteger(int integer);
+
     bool operator==(const T &other) const;
     bool operator!=(const T &other) const;
 

@@ -13,6 +13,7 @@
 
 int g_numFailed = 0;
 
+
 void testEval(QString function, QString expression, QString expected)
 {
 	Evaluator eval;
@@ -73,6 +74,11 @@ void testEval(QString function, QString expression, QString expected)
 
 end:
 	qDebug() << "\033[36mEvaluate\033[0m" << function << expression << "->" << result;
+}
+
+void testEval(QString function, QString expression, QList<Token> expected)
+{
+	testEval(function, expression, pprint(expected));
 }
 
 void testMatch(const QString &test, bool shouldBe, const MatchResult &result)
@@ -210,7 +216,7 @@ void testAllParses()
     testParseAst("Hello; Goodbye");
     testParseAst("Key = Value");
 	testParseAst("123", {AstNode("123", 10)});
-	testParseAst("12 00", {AstNode("12", 10), AstNode("0", 10)});
+	testParseAst("12 00", {AstNode::fromInteger(12), AstNode::fromInteger(0)});
 }
 
 void testAllFunctionDefs()
@@ -222,6 +228,7 @@ void testAllFunctionDefs()
 void testAllEvals()
 {
 	testEval("First {s.A e.Rest = s.A;}", "<First hello>", "h");
+	testEval("Number { = 123; }", "<Number>", QList<Token>{Token::fromInteger(123)});
 }
 
 int main(int argc, char *argv[])
@@ -235,7 +242,7 @@ int main(int argc, char *argv[])
 	cli.addHelpOption();
 	cli.addVersionOption();
 
-	QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite");
+	QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite.");
 	cli.addOption(testOption);
 
 	cli.process(a);
