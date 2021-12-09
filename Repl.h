@@ -16,6 +16,7 @@ public:
 
 protected:
 	QString readLine();
+	void addHistory(QString line);
 	bool trySpecialCase(QString line);
 	bool tryEvaluate(QString line, QList<AstNode> *expr);
 

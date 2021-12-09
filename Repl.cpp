@@ -44,15 +44,20 @@ QString Repl::readLine()
 	return string;
 }
 
+void Repl::addHistory(QString line)
+{
+	ReadLine::add_history(line.toUtf8());
+}
+
 void Repl::start()
 {
 	while (_running)
 	{
-		QString line = readLine();
-
-		line = line.trimmed();
+		QString line = readLine().trimmed();
 
 		QList<AstNode> expr;
+
+		addHistory(line);
 
 		if (trySpecialCase(line))
 		{}
@@ -80,7 +85,7 @@ void Repl::start()
 
 			if (okay)
 			{
-				qDebug() << pprint(out);
+				qDebug().noquote() << pprint(out);
 			}
 		}
 		else
