@@ -9,7 +9,7 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
         return MatchResult{true, context};
     }
 
-    if (pattern.empty() && !data.empty())
+    if ((pattern.empty() && !data.empty()) || (data.empty() && !pattern.empty()))
     {
         return MatchResult{false, context};
     }
@@ -105,7 +105,8 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
 
             case 'e':
                 // Now this is tricky
-                for (int matchSyms = 1; matchSyms < data.length(); matchSyms++)
+                // TODO: Optimize this to check if there is an obvious length that this expression has to be
+                for (int matchSyms = 1; matchSyms <= data.length(); matchSyms++)
                 {
                     QList<Token> slice = listSlice(data, 0, matchSyms);
                     VarContext newContext = context;

@@ -38,6 +38,9 @@ QList<T> listSlice(QList<T> &list, int from, int to)
 {
     QList<T> prime;
 
+	if (from >= list.length())
+		return prime;
+
     // I guess we'll just panic if it's too long
     // TODO: ERROR HANDLING
     for (int i = 0; i < to - from; i++)

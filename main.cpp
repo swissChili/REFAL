@@ -5,8 +5,72 @@
 #include "Token.h"
 #include "AstNode.h"
 #include "Parser.h"
+#include "Evaluator.h"
+#include "VarContext.h"
 
 int g_numFailed = 0;
+
+void testEval(QString function, QString expression, QString expected)
+{
+	Evaluator eval;
+	Parser funcParser(function),
+		exprParser(expression),
+		resParser(expected);
+
+	Function func;
+
+	QList<AstNode> expr = exprParser.parseMany<AstNode>();
+	QList<Token> res = resParser.parseMany<Token>();
+
+	QList<Token> result;
+
+	exprParser.skip();
+	resParser.skip();
+	while (funcParser.parseFunctionDefinition(&func))
+	{
+		eval.addFunction(func);
+	}
+
+	funcParser.skip();
+
+	if (!exprParser.atEnd() || !resParser.atEnd() || !funcParser.atEnd())
+	{
+        g_numFailed++;
+        qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+		qDebug() << "Failed to fully parse expression, function or result";
+		qDebug() << function << expression << expected;
+
+		goto end;
+	}
+
+	for (const AstNode &node : expr)
+	{
+		RuntimeResult rr = eval.evaluate(node, VarContext());
+
+		if (!rr.success())
+		{
+			g_numFailed++;
+			qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+			qDebug() << "Runtime error while evaluating" << node;
+			qDebug() << rr;
+
+			goto end;
+		}
+
+		result.append(rr.result());
+	}
+
+	if (result != res)
+	{
+		g_numFailed++;
+		qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+		qDebug() << "Expected result" << res;
+		qDebug() << "Got" << result;
+	}
+
+end:
+	qDebug() << "\033[36mEvaluate\033[0m" << function << expression << "->" << result;
+}
 
 void testMatch(const QString &test, bool shouldBe, const MatchResult &result)
 {
@@ -30,7 +94,8 @@ void testMatch(QString data, QString pattern, bool shouldBe = true)
     Parser dataParser(data),
         patternParser(pattern);
 
-    testMatch(pattern + " = " + data, shouldBe, match(dataParser.parseMany<Token>(), patternParser.parseMany<Token>(), VarContext()));
+    testMatch(pattern + " = " + data, shouldBe,
+			  match(dataParser.parseMany<Token>(), patternParser.parseMany<Token>(), VarContext()));
 }
 
 void testParseAst(QString string)
@@ -114,6 +179,7 @@ void testAllMatches()
     // testMatch("(y)f Middle-stuff y", "(s.a) e.Middle s.a");
 
     testMatch("(a)", "(a)");
+	testMatch("hello", "s.A e.Rest");
 }
 
 void testAllParses()
@@ -135,7 +201,12 @@ void testAllParses()
 void testAllFunctionDefs()
 {
     testParseFunc("Test { = HI; }");
-    testParseFunc("Palindrome { = T; s.A = T; s.A s.A = T; s.A e.Middle s.A = <Palindrome e.Middle>; } ");
+    testParseFunc("Palindrome { = T; s.A = T; s.A s.A = T; s.A e.Middle s.A = <Palindrome e.Middle>; e.Ignored = F; } ");
+}
+
+void testAllEvals()
+{
+	testEval("First {s.A e.Rest = s.A;}", "<First hello>", "h");
 }
 
 int main(int argc, char *argv[])
@@ -147,6 +218,8 @@ int main(int argc, char *argv[])
     testAllParses();
     qDebug() << "";
     testAllFunctionDefs();
+	qDebug() << "";
+	testAllEvals();
 
     qDebug() << "";
     return testResults();
