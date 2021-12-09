@@ -10,6 +10,7 @@ public:
     TokenBase();
     TokenBase(const T &other);
 
+	TokenBase(QString integer, int base);
     explicit TokenBase(QChar symbol);
     explicit TokenBase(QString identifier);
     explicit TokenBase(QList<T> parenthesized);
@@ -22,12 +23,14 @@ public:
     bool isIdent() const;
     bool isParen() const;
     bool isVar() const;
+	bool isInteger() const;
 
     QList<T> parenContent();
 
     char varType() const;
     const QString &name() const;
     QChar symbol() const;
+	int integer() const;
 
     operator QString() const;
 
@@ -37,6 +40,7 @@ public:
         IDENT,
         PAREN,
         VAR,
+		INTEGER,
         TOKEN_TYPE_LAST,
     };
 
@@ -46,6 +50,7 @@ public:
 
 protected:
     int _type = 0;
+	int _intVal = 0;
     QString _stringVal = "";
     QList<T> _listVal;
     QChar _charVal = 0;

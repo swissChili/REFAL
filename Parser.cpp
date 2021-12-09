@@ -78,7 +78,7 @@ bool Parser::parseNumber(T *node)
         while (peek().isDigit())
             buffer += get();
 
-        *node = T(buffer.toInt());
+        *node = T(buffer, 10);
         return true;
     }
 

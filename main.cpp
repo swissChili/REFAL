@@ -9,6 +9,7 @@
 #include "Evaluator.h"
 #include "VarContext.h"
 #include "Repl.h"
+#include "PPrint.h"
 
 int g_numFailed = 0;
 
@@ -100,13 +101,20 @@ void testMatch(QString data, QString pattern, bool shouldBe = true)
 			  match(dataParser.parseMany<Token>(), patternParser.parseMany<Token>(), VarContext()));
 }
 
-void testParseAst(QString string)
+void testParseAst(QString string, QList<AstNode> equals = {})
 {
     Parser parser{string};
 
     QList<AstNode> result = parser.parseMany<AstNode>();
 
-    qDebug() << "\033[36mParse\033[0m" << string << result;
+	if (!equals.empty() && result != equals)
+	{
+        g_numFailed++;
+        qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+        qDebug() << "Expected" << pprint(equals);
+	}
+
+    qDebug() << "\033[36mParse\033[0m" << string << pprint(result);
 }
 
 void testParseFunc(QString string)
@@ -182,6 +190,9 @@ void testAllMatches()
 
     testMatch("(a)", "(a)");
 	testMatch("hello", "s.A e.Rest");
+	testMatch("123", "123");
+	testMatch("(123)", "t.a");
+	testMatch("(123)", "(s.a)");
 }
 
 void testAllParses()
@@ -198,6 +209,8 @@ void testAllParses()
     testParseAst("(s.a) e.Middle s.a");
     testParseAst("Hello; Goodbye");
     testParseAst("Key = Value");
+	testParseAst("123", {AstNode("123", 10)});
+	testParseAst("12 00", {AstNode("12", 10), AstNode("0", 10)});
 }
 
 void testAllFunctionDefs()

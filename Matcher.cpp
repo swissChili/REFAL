@@ -18,7 +18,7 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
     Token dataHead = data.first();
     pattern.removeFirst();
 
-    if (ph.isSym() || ph.isIdent())
+    if (ph.isSym() || ph.isIdent() || ph.isInteger())
     {
         if (ph == data.first())
         {
@@ -90,7 +90,7 @@ MatchResult match(QList<Token> data, QList<Token> pattern, VarContext context)
                     typeIsOk = true;
 
             case 's':
-                if (dataHead.isSym() || dataHead.isIdent())
+                if (dataHead.isSym() || dataHead.isIdent() || dataHead.isInteger())
                     typeIsOk = true;
 
                 if (!typeIsOk)

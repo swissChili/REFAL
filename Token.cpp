@@ -38,6 +38,13 @@ TokenBase<T>::TokenBase(QList<T> parenthesized)
 }
 
 template <typename T>
+TokenBase<T>::TokenBase(QString integer, int base)
+{
+	_type = INTEGER;
+	_intVal = integer.toInt(nullptr, base);
+}
+
+template <typename T>
 TokenBase<T>::TokenBase(char varType, const QString name)
 {
     _type = VAR;
@@ -69,6 +76,12 @@ bool TokenBase<T>::isVar() const
 }
 
 template <typename T>
+bool TokenBase<T>::isInteger() const
+{
+	return _type == INTEGER;
+}
+
+template <typename T>
 TokenBase<T>::TokenBase() : TokenBase("Null")
 {
 }
@@ -90,6 +103,12 @@ QList<T> TokenBase<T>::parenContent()
     {
         return {};
     }
+}
+
+template <typename T>
+int TokenBase<T>::integer() const
+{
+	return _intVal;
 }
 
 template <typename T>
@@ -119,6 +138,8 @@ TokenBase<T>::operator QString() const
         return _charVal;
     if (isVar())
         return QString(_charVal) + "." + _stringVal;
+	if (isInteger())
+		return QString::number(_intVal, 10);
     if (isParen())
     {
         QStringList parts;
@@ -142,7 +163,7 @@ int TokenBase<T>::type() const
 template <typename T>
 QString TokenBase<T>::typeToString(int type)
 {
-    static const QString typeNames[] = {"SYMBOL", "IDENT", "PAREN", "VAR"};
+    static const QString typeNames[] = {"SYMBOL", "IDENT", "PAREN", "VAR", "INTEGER"};
     return typeNames[type];
 }
 
