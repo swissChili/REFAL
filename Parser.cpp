@@ -197,7 +197,6 @@ ParseResult Parser::parseMany(QList<T> *list)
 
     while ((ret = parseOne(&next)))
     {
-		// qDebug() << "parseMany one" << next;
         nodes.append(next);
     }
 
@@ -308,8 +307,6 @@ ParseResult Parser::parseSentence(Sentence *sentence)
 {
 	ParsePos pos = save();
 
-	qDebug() << "Parsing sentence" << peek();
-
 	if (peek() == '}')
 	{
 		return false;
@@ -320,14 +317,11 @@ ParseResult Parser::parseSentence(Sentence *sentence)
 
 	if (!ret)
 	{
-		qDebug() << "Many failed" << ret.message();
 		reset(pos);
 		return ret;
 	}
 
     skip();
-
-	qDebug() << "will we get an =?" << peek();
 
     if (get() != '=')
     {
@@ -341,14 +335,11 @@ ParseResult Parser::parseSentence(Sentence *sentence)
 
 	if (!ret)
 	{
-		qDebug() << "sentence parseMany returned" << ret.message();
 		reset(pos);
 		return ret;
 	}
 
     skip();
-
-	qDebug() << "end of sentence" << peek();
 
     if (peek() != '}' && get() != ';')
     {
@@ -394,7 +385,6 @@ ParseResult Parser::parseFunctionDefinition(Function *function)
 
 	if (ret.status() == ParseResult::INCOMPLETE)
 	{
-		qDebug() << "Function incomplete";
 		reset(pos);
 		return ret;
 	}
@@ -405,8 +395,6 @@ ParseResult Parser::parseFunctionDefinition(Function *function)
 		reset(pos);
         return ret;
     }
-
-	qDebug() << "Function parsing succeeded";
 
     *function = func;
     return true;

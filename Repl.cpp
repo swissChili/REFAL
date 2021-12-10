@@ -35,8 +35,6 @@ QString Repl::readLine()
 		return "";
 	}
 
-	ReadLine::add_history(line);
-
 	QString string = QString::fromUtf8(line);
 
 	free(line);
@@ -57,11 +55,14 @@ void Repl::start()
 
 		QList<AstNode> expr;
 
-		addHistory(line);
+		if (!line.isEmpty())
+			addHistory(line);
+
+		ParseResult ret;
 
 		if (trySpecialCase(line))
 		{}
-		else if (tryEvaluate(line, &expr))
+		else if ((ret = tryEvaluate(line, &expr)))
 		{
 			bool okay = true;
 			QList<Token> out;
@@ -88,6 +89,15 @@ void Repl::start()
 				qDebug().noquote() << pprint(out);
 			}
 		}
+		else if (ret.status() == ParseResult::INCOMPLETE)
+		{
+			qDebug() << "INCOMPLETE";
+			ReadLine::rl_line_buffer = line.toUtf8().data();
+			// ReadLine::rl_insert_text("\n");
+			// ReadLine::rl_on_new_line();
+			ReadLine::rl_redisplay();
+			// ReadLine::rl_message("Incomplete");
+		}
 		else
 		{
 			qDebug() << "What?";
@@ -95,7 +105,7 @@ void Repl::start()
 	}
 }
 
-bool Repl::trySpecialCase(QString line)
+ParseResult Repl::trySpecialCase(QString line)
 {
 	if (line.startsWith("."))
 	{
@@ -114,23 +124,26 @@ bool Repl::trySpecialCase(QString line)
 	return false;
 }
 
-bool Repl::tryEvaluate(QString line, QList<AstNode> *expr)
+ParseResult Repl::tryEvaluate(QString line, QList<AstNode> *expr)
 {
 	Parser parser(line);
 	Function func;
 
-	if (parser.parseFunctionDefinition(&func))
+	ParseResult ret;
+
+	if ((ret = parser.parseFunctionDefinition(&func)))
 	{
 		_eval.addFunction(func);
 		*expr = {};
 
 		return true;
 	}
-
-	if (!parser.parseMany(expr))
-		return false;
-
-	parser.skip();
-
-	return parser.atEnd();
+	else if (ret.status() == ParseResult::INCOMPLETE)
+	{
+		return ret;
+	}
+	else
+	{
+		return parser.parseMany(expr);
+	}
 }

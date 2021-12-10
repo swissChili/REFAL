@@ -5,6 +5,7 @@
 
 #include "Evaluator.h"
 #include "AstNode.h"
+#include "Parser.h"
 
 class Repl
 {
@@ -17,8 +18,8 @@ public:
 protected:
 	QString readLine();
 	void addHistory(QString line);
-	bool trySpecialCase(QString line);
-	bool tryEvaluate(QString line, QList<AstNode> *expr);
+	ParseResult trySpecialCase(QString line);
+	ParseResult tryEvaluate(QString line, QList<AstNode> *expr);
 
 	Evaluator _eval;
 
