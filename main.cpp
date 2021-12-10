@@ -23,26 +23,31 @@ void testEval(QString function, QString expression, QString expected)
 
 	Function func;
 
-	QList<AstNode> expr = exprParser.parseMany<AstNode>();
-	QList<Token> res = resParser.parseMany<Token>();
+	QList<AstNode> expr;
+	ParseResult exprRet = exprParser.parseMany<AstNode>(&expr);
+	QList<Token> res;
+	ParseResult resRet = resParser.parseMany<Token>(&res);
+	ParseResult funcRet;
 
 	QList<Token> result;
 
 	exprParser.skip();
 	resParser.skip();
-	while (funcParser.parseFunctionDefinition(&func))
+	while ((funcRet = funcParser.parseFunctionDefinition(&func)))
 	{
 		eval.addFunction(func);
 	}
 
 	funcParser.skip();
 
-	if (!exprParser.atEnd() || !resParser.atEnd() || !funcParser.atEnd())
+	if (!exprRet || !resRet || funcRet.status() == ParseResult::INCOMPLETE)
 	{
         g_numFailed++;
         qDebug() << "\n\033[31mTEST FAILS:\033[0m";
 		qDebug() << "Failed to fully parse expression, function or result";
 		qDebug() << function << expression << expected;
+		qDebug() << funcRet.message() << exprRet.message() << resRet.message();
+		qDebug() << funcRet << exprRet << resRet;
 
 		goto end;
 	}
@@ -103,15 +108,21 @@ void testMatch(QString data, QString pattern, bool shouldBe = true)
     Parser dataParser(data),
         patternParser(pattern);
 
+	QList<Token> parsedData, parsedPattern;
+	
+	dataParser.parseMany<Token>(&parsedData);
+	patternParser.parseMany<Token>(&parsedPattern);
+
     testMatch(pattern + " = " + data, shouldBe,
-			  match(dataParser.parseMany<Token>(), patternParser.parseMany<Token>(), VarContext()));
+			  match(parsedData, parsedPattern, VarContext()));
 }
 
 void testParseAst(QString string, QList<AstNode> equals = {})
 {
     Parser parser{string};
 
-    QList<AstNode> result = parser.parseMany<AstNode>();
+    QList<AstNode> result;
+	parser.parseMany<AstNode>(&result);
 
 	if (!equals.empty() && result != equals)
 	{
@@ -126,13 +137,15 @@ void testParseAst(QString string, QList<AstNode> equals = {})
 void testParseFunc(QString string)
 {
     Parser parser{string};
+	ParseResult ret;
 
     Function func;
 
-    if (!parser.parseFunctionDefinition(&func))
+    if (!(ret = parser.parseFunctionDefinition(&func)))
     {
         g_numFailed++;
         qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+		qDebug() << ret.message();
         qDebug() << string;
     }
     else

@@ -127,7 +127,9 @@ bool Repl::tryEvaluate(QString line, QList<AstNode> *expr)
 		return true;
 	}
 
-	*expr = parser.parseMany<AstNode>();
+	if (!parser.parseMany(expr))
+		return false;
+
 	parser.skip();
 
 	return parser.atEnd();

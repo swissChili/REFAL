@@ -6,6 +6,40 @@
 #include "AstNode.h"
 #include "Function.h"
 
+struct ParsePos
+{
+	int line = 0,
+		pos = 0,
+		lineOffset = 0;
+};
+
+class ParseResult
+{
+public:
+	ParseResult() = default;
+	ParseResult(bool okay);
+	explicit ParseResult(int status, ParsePos pos = {});
+	ParseResult(int status, QString message, ParsePos pos = {});
+	
+	enum
+	{
+		NO_MATCH,
+		COMPLETE,
+		INCOMPLETE,
+	};
+
+	operator bool() const;
+
+	ParsePos pos() const;
+	QString message() const;
+	int status() const;
+
+private:
+	int _status = COMPLETE;
+	QString _message = "";
+	ParsePos _pos;
+};
+
 class Parser
 {
 public:
@@ -18,38 +52,44 @@ public:
     void skip();
 
     template <typename T>
-    bool parseSymbol(T *node);
+    ParseResult parseSymbol(T *node);
 
     template <typename T>
-    bool parseIdentifier(T *node);
+    ParseResult parseIdentifier(T *node);
 
     template <typename T>
-    bool parseNumber(T *node);
+    ParseResult parseNumber(T *node);
 
     template <typename T>
-    bool parseVariable(T *node);
+    ParseResult parseVariable(T *node);
 
     template <typename T>
-    bool parseParens(T *node);
+    ParseResult parseParens(T *node);
 
-    bool parseFunction(AstNode *node);
-
-    template <typename T>
-    QList<T> parseMany();
+    ParseResult parseFunction(AstNode *node);
 
     template <typename T>
-    bool parseOne(T *node);
+    ParseResult parseMany(QList<T> *list);
 
-    bool parseSentence(Sentence *sentence);
-    bool parseFunctionDefinition(Function *function);
+    template <typename T>
+    ParseResult parseOne(T *node);
+
+    ParseResult parseSentence(Sentence *sentence);
+    ParseResult parseFunctionDefinition(Function *function);
+
+	ParsePos save() const;
+	void reset(ParsePos pos);
 
 private:
     int _pos = 0;
+	int _line = 1;
+	int _offset = 1;
+
     QString _input;
 };
 
 template <>
-bool Parser::parseOne<Token>(Token *node);
+ParseResult Parser::parseOne<Token>(Token *node);
 
 template <>
-bool Parser::parseOne<AstNode>(AstNode *node);
+ParseResult Parser::parseOne<AstNode>(AstNode *node);

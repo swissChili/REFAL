@@ -2,6 +2,41 @@
 
 #include <QDebug>
 
+ParseResult::ParseResult(bool okay)
+	: ParseResult((int)okay)
+{}
+
+ParseResult::ParseResult(int status, ParsePos pos)
+	: ParseResult(status, "", pos)
+{}
+
+ParseResult::ParseResult(int status, QString message, ParsePos pos)
+{
+	_status = status;
+	_message = message;
+	_pos = pos;
+}
+
+ParseResult::operator bool() const
+{
+	return _status == COMPLETE;
+}
+
+ParsePos ParseResult::pos() const
+{
+	return _pos;
+}
+
+QString ParseResult::message() const
+{
+	return _message;
+}
+
+int ParseResult::status() const
+{
+	return _status;
+}
+
 Parser::Parser(QString input)
 {
     _input = input;
@@ -17,7 +52,19 @@ QChar Parser::peek()
 
 QChar Parser::get()
 {
-    return _input[_pos++];
+    QChar c = _input[_pos++];
+
+	if (c == '\n')
+	{
+		_line++;
+		_offset = 0;
+	}
+	else
+	{
+		_offset++;
+	}
+
+	return c;
 }
 
 bool Parser::atEnd()
@@ -31,8 +78,20 @@ void Parser::skip()
         get();
 }
 
+ParsePos Parser::save() const
+{
+	return ParsePos{_line, _pos, _offset};
+}
+
+void Parser::reset(ParsePos pos)
+{
+	_line = pos.line;
+	_pos = pos.pos;
+	_offset = pos.lineOffset;
+}
+
 template <typename T>
-bool Parser::parseSymbol(T *node)
+ParseResult Parser::parseSymbol(T *node)
 {
     skip();
 
@@ -46,7 +105,7 @@ bool Parser::parseSymbol(T *node)
 }
 
 template <typename T>
-bool Parser::parseIdentifier(T *node)
+ParseResult Parser::parseIdentifier(T *node)
 {
     skip();
 
@@ -67,7 +126,7 @@ bool Parser::parseIdentifier(T *node)
 }
 
 template <typename T>
-bool Parser::parseNumber(T *node)
+ParseResult Parser::parseNumber(T *node)
 {
     skip();
 
@@ -86,11 +145,11 @@ bool Parser::parseNumber(T *node)
 }
 
 template <typename T>
-bool Parser::parseVariable(T *node)
+ParseResult Parser::parseVariable(T *node)
 {
     skip();
 
-    int pos = _pos;
+	ParsePos pos = save();
 
     if (peek() == 's' || peek() == 'e' || peek() == 't')
     {
@@ -112,47 +171,68 @@ bool Parser::parseVariable(T *node)
                 *node = T(type, QString(nameNode.symbol()));
                 return true;
             }
+			else
+			{
+				ParseResult ret(ParseResult::INCOMPLETE,
+								"Expected identifier or symbol after . in variable",
+								pos);
+
+				reset(pos);
+
+				return ret;
+			}
         }
     }
 
-    _pos = pos;
+	reset(pos);
     return false;
 }
 
 template <typename T>
-QList<T> Parser::parseMany()
+ParseResult Parser::parseMany(QList<T> *list)
 {
-    QList<T > nodes;
+    QList<T> nodes;
     T next;
+	ParseResult ret;
 
-    while (parseOne(&next))
+    while ((ret = parseOne(&next)))
     {
+		// qDebug() << "parseMany one" << next;
         nodes.append(next);
     }
 
-    return nodes;
+	*list = nodes;
+
+	if (ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	else
+		return true;
 }
 
 template <typename T>
-bool Parser::parseParens(T *node)
+ParseResult Parser::parseParens(T *node)
 {
     skip();
 
-    int pos = _pos;
+    ParsePos pos = save();
 
     if (peek() != '(')
         return false;
 
     get();
 
-    QList<T> many = parseMany<T>();
+    QList<T> many;
+	ParseResult ret = parseMany(&many);
+
     *node = T(many);
 
     skip();
     if (peek() != ')')
     {
-        _pos = pos;
-        return false;
+		ret = ParseResult(ParseResult::INCOMPLETE, "Expected ) in parenthesized list", save());
+		reset(pos);
+
+		return ret;
     }
 
     get();
@@ -160,11 +240,12 @@ bool Parser::parseParens(T *node)
     return true;
 }
 
-bool Parser::parseFunction(AstNode *node)
+ParseResult Parser::parseFunction(AstNode *node)
 {
     skip();
 
-    int pos = _pos;
+    ParsePos pos = save();
+	ParseResult ret;
 
     if (peek() != '<')
         return false;
@@ -172,20 +253,29 @@ bool Parser::parseFunction(AstNode *node)
     get();
 
     AstNode head;
-    if (!parseIdentifier(&head))
+    if (!(ret = parseIdentifier(&head)))
     {
-        _pos = pos;
-        return false;
+		reset(pos);
+		return ret;
     }
 
-    QList<AstNode> body = parseMany<AstNode>();
+    QList<AstNode> body;
+	ret = parseMany(&body);
+
+	if (!ret)
+	{
+		reset(pos);
+		return ret;
+	}
+
     *node = AstNode(head.name(), body);
 
     skip();
     if (peek() != '>')
     {
-        _pos = pos;
-        return false;
+		ret = ParseResult(ParseResult::INCOMPLETE, "Expected >", save());
+		reset(pos);
+        return ret;
     }
 
     get();
@@ -194,7 +284,7 @@ bool Parser::parseFunction(AstNode *node)
 }
 
 template <>
-bool Parser::parseOne<Token>(Token *node)
+ParseResult Parser::parseOne<Token>(Token *node)
 {
     return parseVariable(node) ||
            parseNumber(node) ||
@@ -204,7 +294,7 @@ bool Parser::parseOne<Token>(Token *node)
 }
 
 template <>
-bool Parser::parseOne<AstNode>(AstNode *node)
+ParseResult Parser::parseOne<AstNode>(AstNode *node)
 {
     return parseFunction(node) ||
            parseVariable(node) ||
@@ -214,43 +304,74 @@ bool Parser::parseOne<AstNode>(AstNode *node)
            parseParens(node);
 }
 
-bool Parser::parseSentence(Sentence *sentence)
+ParseResult Parser::parseSentence(Sentence *sentence)
 {
-    int pos = _pos;
+	ParsePos pos = save();
 
-    QList<Token> pattern = parseMany<Token>();
+	qDebug() << "Parsing sentence" << peek();
+
+	if (peek() == '}')
+	{
+		return false;
+	}
+
+    QList<Token> pattern;
+	ParseResult ret = parseMany(&pattern);
+
+	if (!ret)
+	{
+		qDebug() << "Many failed" << ret.message();
+		reset(pos);
+		return ret;
+	}
 
     skip();
+
+	qDebug() << "will we get an =?" << peek();
 
     if (get() != '=')
     {
-        _pos = pos;
-        return false;
+        ret = ParseResult(ParseResult::INCOMPLETE, "Expected = in sentence", save());
+		reset(pos);
+		return ret;
     }
 
-    QList<AstNode> result = parseMany<AstNode>();
+    QList<AstNode> result;
+	ret = parseMany(&result);
+
+	if (!ret)
+	{
+		qDebug() << "sentence parseMany returned" << ret.message();
+		reset(pos);
+		return ret;
+	}
 
     skip();
 
-    if (get() != ';')
+	qDebug() << "end of sentence" << peek();
+
+    if (peek() != '}' && get() != ';')
     {
-        _pos = pos;
-        return false;
+		ret = ParseResult(ParseResult::INCOMPLETE, "Expected ; or } after sentence", save());
+		reset(pos);
+		return ret;
     }
 
     *sentence = Sentence(pattern, result);
+
     return true;
 }
 
-bool Parser::parseFunctionDefinition(Function *function)
+ParseResult Parser::parseFunctionDefinition(Function *function)
 {
-    int pos = _pos;
+	ParsePos pos = save();
+	ParseResult ret;
 
     Token identifier;
-    if (!parseIdentifier(&identifier))
+    if (!(ret = parseIdentifier(&identifier)))
     {
-        _pos = pos;
-        return false;
+		reset(pos);
+        return ret;
     }
 
     QString name = identifier.name();
@@ -260,22 +381,32 @@ bool Parser::parseFunctionDefinition(Function *function)
 
     if (get() != '{')
     {
-        _pos = pos;
-        return false;
+		reset(pos);
+		return false;
     }
 
     Sentence sentence;
-    while (parseSentence(&sentence))
+    while ((ret = parseSentence(&sentence)))
     {
         func.addSentence(sentence);
         skip();
     }
 
+	if (ret.status() == ParseResult::INCOMPLETE)
+	{
+		qDebug() << "Function incomplete";
+		reset(pos);
+		return ret;
+	}
+
     if (get() != '}')
     {
-        _pos = pos;
-        return false;
+		ret = ParseResult(ParseResult::INCOMPLETE, "Expected } at end of function");
+		reset(pos);
+        return ret;
     }
+
+	qDebug() << "Function parsing succeeded";
 
     *function = func;
     return true;
