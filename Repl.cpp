@@ -67,7 +67,7 @@ void Repl::start()
 			bool okay = true;
 			QList<Token> out;
 
-			for (const AstNode &node : expr)
+            for (const AstNode &node : qAsConst(expr))
 			{
 				RuntimeResult res = _eval.evaluate(node, VarContext());
 
@@ -91,16 +91,13 @@ void Repl::start()
 		}
 		else if (ret.status() == ParseResult::INCOMPLETE)
 		{
-			qDebug() << "INCOMPLETE";
-			ReadLine::rl_line_buffer = line.toUtf8().data();
-			// ReadLine::rl_insert_text("\n");
-			// ReadLine::rl_on_new_line();
-			ReadLine::rl_redisplay();
-			// ReadLine::rl_message("Incomplete");
+            qDebug() << "Parse error: incomplete input:" << ret.message();
+            ReadLine::rl_insert_text("Hello there!");
+            ReadLine::rl_redisplay();
 		}
 		else
 		{
-			qDebug() << "What?";
+            qDebug() << "Parse error:" << ret.message();
 		}
 	}
 }
@@ -131,7 +128,7 @@ ParseResult Repl::tryEvaluate(QString line, QList<AstNode> *expr)
 
 	ParseResult ret;
 
-	if ((ret = parser.parseFunctionDefinition(&func)))
+    if ((ret = parser.parseFunctionDefinition(&func)))
 	{
 		_eval.addFunction(func);
 		*expr = {};

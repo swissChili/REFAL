@@ -34,6 +34,8 @@ public:
 	QString message() const;
 	int status() const;
 
+    ParseResult operator ||(const ParseResult &other) const;
+
 private:
 	int _status = COMPLETE;
 	QString _message = "";

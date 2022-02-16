@@ -37,6 +37,14 @@ int ParseResult::status() const
 	return _status;
 }
 
+ParseResult ParseResult::operator ||(const ParseResult &other) const
+{
+    if (_status == COMPLETE || _status == INCOMPLETE)
+        return *this;
+    else
+        return other;
+}
+
 Parser::Parser(QString input)
 {
     _input = input;
