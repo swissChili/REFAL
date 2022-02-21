@@ -6,7 +6,7 @@ SETUP
 
 DEPENDENCIES
 
-	Install libedit-dev and libqt5core5a
+	Install libreadline-dev and libqt5core5a
 
 
 OPTIMIZATION POSSIBILITIES:

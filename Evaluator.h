@@ -27,7 +27,7 @@ private:
 
 class Evaluator {
 public:
-	Evaluator() = default;
+	Evaluator();
 
 	void addFunction(Function func);
 	void clearFunction(QString name);

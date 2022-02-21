@@ -36,6 +36,10 @@ RuntimeResult::operator QString() const
 	return QString(_success) + " " + _errorMessage;
 }
 
+Evaluator::Evaluator()
+{
+}
+
 void Evaluator::addFunction(Function func)
 {
 	_functions[func.name()] = func;
@@ -125,6 +129,11 @@ RuntimeResult Evaluator::callFunction(QString name, QList<Token> args)
 
 		if (!res.success)
 			continue;
+
+		if (sentence.isExternal())
+		{
+			return RuntimeResult(sentence.externResult(args));
+		}
 
 		QList<Token> final;
 		for (const AstNode &node : sentence.result())

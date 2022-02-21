@@ -1,4 +1,6 @@
 #include "Function.h"
+#include "Parser.h"
+#include <QDebug>
 
 template <typename T>
 QString join(QList<T> list, QString sep)
@@ -13,10 +15,30 @@ QString join(QList<T> list, QString sep)
 	return strings.join(sep);
 }
 
+Sentence::~Sentence()
+{
+}
+
 Sentence::Sentence(QList<Token> pattern, QList<AstNode> result)
 {
 	_pattern = pattern;
 	_result = result;
+}
+
+Sentence::Sentence(QList<Token> pattern, SentenceResultFn result)
+{
+	_pattern = pattern;
+	_native = result;
+}
+
+bool Sentence::isExternal() const
+{
+	return _native != nullptr;
+}
+
+QList<Token> Sentence::externResult(QList<Token> args) const
+{
+	return _native(std::move(args));
 }
 
 QList<Token> Sentence::pattern() const
@@ -50,6 +72,22 @@ void Function::addSentence(Sentence sentence)
 	_sentences.append(sentence);
 }
 
+void Function::addNativeSentence(QString pattern, SentenceResultFn fn)
+{
+	Parser parser(std::move(pattern));
+	QList<Token> parsedPattern;
+
+	ParseResult res = parser.parseMany(&parsedPattern);
+	if (!res)
+	{
+		qDebug() << "Failed to parse pattern for native sentence";
+		qDebug() << res.message();
+	}
+	else
+	{
+		addSentence(Sentence(parsedPattern, std::move(fn)));
+	}
+}
 
 QString Function::name() const
 {

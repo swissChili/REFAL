@@ -11,6 +11,8 @@ struct ParsePos
 	int line = 0,
 		pos = 0,
 		lineOffset = 0;
+
+    operator QString();
 };
 
 class ParseResult
@@ -34,8 +36,6 @@ public:
 	QString message() const;
 	int status() const;
 
-    ParseResult operator ||(const ParseResult &other) const;
-
 private:
 	int _status = COMPLETE;
 	QString _message = "";
@@ -52,6 +52,8 @@ public:
     bool atEnd();
 
     void skip();
+
+    QString line(int n) const;
 
     template <typename T>
     ParseResult parseSymbol(T *node);

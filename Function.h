@@ -3,10 +3,17 @@
 #include "Token.h"
 #include "AstNode.h"
 
+using SentenceResultFn = std::function<QList<Token> (QList<Token>)>;
+
 class Sentence {
 public:
 	Sentence() = default;
+	~Sentence();
 	Sentence(QList<Token> pattern, QList<AstNode> result);
+	Sentence(QList<Token> pattern, SentenceResultFn result);
+
+	bool isExternal() const;
+	QList<Token> externResult(QList<Token> args) const;
 
 	QList<Token> pattern() const;
 	QList<AstNode> result() const;
@@ -16,6 +23,7 @@ public:
 protected:
 	QList<Token> _pattern;
 	QList<AstNode> _result;
+	SentenceResultFn _native = nullptr;
 };
 
 class Function {
@@ -25,6 +33,7 @@ public:
 	Function(QString name, QList<Sentence> sentences);
 
 	void addSentence(Sentence sentence);
+	void addNativeSentence(QString pattern, SentenceResultFn fn);
 
 	QString name() const;
 	QList<Sentence> sentences() const;

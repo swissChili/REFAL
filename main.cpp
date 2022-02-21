@@ -45,9 +45,14 @@ void testEval(QString function, QString expression, QString expected)
         g_numFailed++;
         qDebug() << "\n\033[31mTEST FAILS:\033[0m";
 		qDebug() << "Failed to fully parse expression, function or result";
-		qDebug() << function << expression << expected;
-		qDebug() << funcRet.message() << exprRet.message() << resRet.message();
-		qDebug() << funcRet << exprRet << resRet;
+        qDebug() << "Function:";
+        sout(pprint(funcRet, funcParser));
+
+        qDebug() << "Expression:";
+        sout(pprint(exprRet, exprParser));
+
+        qDebug() << "Result:";
+        sout(pprint(resRet, resParser));
 
 		goto end;
 	}
@@ -145,7 +150,7 @@ void testParseFunc(QString string)
     {
         g_numFailed++;
         qDebug() << "\n\033[31mTEST FAILS:\033[0m";
-		qDebug() << ret.message();
+        sout(pprint(ret, parser));
         qDebug() << string;
     }
     else
@@ -230,6 +235,7 @@ void testAllParses()
     testParseAst("Key = Value");
 	testParseAst("123", {AstNode("123", 10)});
 	testParseAst("12 00", {AstNode::fromInteger(12), AstNode::fromInteger(0)});
+    testParseAst("s.A s.B", {AstNode('s', "A"), AstNode('s', "B")});
 }
 
 void testAllFunctionDefs()
@@ -255,12 +261,18 @@ int main(int argc, char *argv[])
 	cli.addHelpOption();
 	cli.addVersionOption();
 
+    cli.addPositionalArgument("script", "REFAL script to run");
+
 	QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite.");
 	cli.addOption(testOption);
 
 	cli.process(a);
 
-	if (cli.isSet(testOption))
+    if (cli.positionalArguments().length() > 0)
+    {
+        qDebug() << "Running script" << cli.positionalArguments()[0];
+    }
+    else if (cli.isSet(testOption))
 	{
 		testAllMatches();
 		qDebug() << "";

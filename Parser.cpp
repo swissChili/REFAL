@@ -13,7 +13,7 @@ ParseResult::ParseResult(int status, ParsePos pos)
 ParseResult::ParseResult(int status, QString message, ParsePos pos)
 {
 	_status = status;
-	_message = message;
+    _message = message;
 	_pos = pos;
 }
 
@@ -35,14 +35,6 @@ QString ParseResult::message() const
 int ParseResult::status() const
 {
 	return _status;
-}
-
-ParseResult ParseResult::operator ||(const ParseResult &other) const
-{
-    if (_status == COMPLETE || _status == INCOMPLETE)
-        return *this;
-    else
-        return other;
 }
 
 Parser::Parser(QString input)
@@ -84,6 +76,11 @@ void Parser::skip()
 {
     while (peek().isSpace())
         get();
+}
+
+QString Parser::line(int n) const
+{
+    return _input.split("\n")[n];
 }
 
 ParsePos Parser::save() const
@@ -183,7 +180,7 @@ ParseResult Parser::parseVariable(T *node)
 			{
 				ParseResult ret(ParseResult::INCOMPLETE,
 								"Expected identifier or symbol after . in variable",
-								pos);
+                                save());
 
 				reset(pos);
 
@@ -262,8 +259,9 @@ ParseResult Parser::parseFunction(AstNode *node)
     AstNode head;
     if (!(ret = parseIdentifier(&head)))
     {
+        ParsePos endPos = save();
 		reset(pos);
-		return ret;
+        return ParseResult(ParseResult::INCOMPLETE, "Expected identifier following < in function call", endPos);
     }
 
     QList<AstNode> body;
@@ -293,22 +291,35 @@ ParseResult Parser::parseFunction(AstNode *node)
 template <>
 ParseResult Parser::parseOne<Token>(Token *node)
 {
-    return parseVariable(node) ||
-           parseNumber(node) ||
-           parseIdentifier(node) ||
-           parseSymbol(node) ||
-           parseParens(node);
+	ParseResult ret;
+
+	if ((ret = parseVariable(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseNumber(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseIdentifier(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseSymbol(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	return parseParens(node);
 }
 
 template <>
 ParseResult Parser::parseOne<AstNode>(AstNode *node)
 {
-    return parseFunction(node) ||
-           parseVariable(node) ||
-           parseNumber(node) ||
-           parseIdentifier(node) ||
-           parseSymbol(node) ||
-           parseParens(node);
+	ParseResult ret;
+
+	if ((ret = parseFunction(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseVariable(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseNumber(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseIdentifier(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	if ((ret = parseSymbol(node)).status() == ParseResult::COMPLETE || ret.status() == ParseResult::INCOMPLETE)
+		return ret;
+	return parseParens(node);
 }
 
 ParseResult Parser::parseSentence(Sentence *sentence)
@@ -391,7 +402,7 @@ ParseResult Parser::parseFunctionDefinition(Function *function)
         skip();
     }
 
-	if (ret.status() == ParseResult::INCOMPLETE)
+    if (ret.status() == ParseResult::INCOMPLETE)
 	{
 		reset(pos);
 		return ret;
@@ -399,11 +410,16 @@ ParseResult Parser::parseFunctionDefinition(Function *function)
 
     if (get() != '}')
     {
-		ret = ParseResult(ParseResult::INCOMPLETE, "Expected } at end of function");
+        ret = ParseResult(ParseResult::INCOMPLETE, "Expected } at end of function", save());
 		reset(pos);
         return ret;
     }
 
     *function = func;
     return true;
+}
+
+ParsePos::operator QString()
+{
+    return QString::number(line) + ":" + QString::number(lineOffset);
 }

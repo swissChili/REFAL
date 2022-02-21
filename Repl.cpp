@@ -6,6 +6,7 @@
 #include "Repl.h"
 #include "Parser.h"
 #include "PPrint.h"
+#include "StdLib.h"
 
 // JANK! librl isn't namespaced!
 namespace ReadLine
@@ -17,6 +18,7 @@ namespace ReadLine
 
 Repl::Repl()
 {
+	StdLib().load(_eval);
 }
 
 char *Repl::prompt()
@@ -59,10 +61,11 @@ void Repl::start()
 			addHistory(line);
 
 		ParseResult ret;
+        Parser parser{line};
 
 		if (trySpecialCase(line))
 		{}
-		else if ((ret = tryEvaluate(line, &expr)))
+        else if ((ret = tryEvaluate(parser, &expr)))
 		{
 			bool okay = true;
 			QList<Token> out;
@@ -86,12 +89,13 @@ void Repl::start()
 
 			if (okay)
 			{
-				qDebug().noquote() << pprint(out);
+                sout(pprint(out));
 			}
 		}
 		else if (ret.status() == ParseResult::INCOMPLETE)
 		{
-            qDebug() << "Parse error: incomplete input:" << ret.message();
+            qDebug() << "Parse error: incomplete input:";
+            sout(pprint(ret, parser));
             ReadLine::rl_insert_text("Hello there!");
             ReadLine::rl_redisplay();
 		}
@@ -121,10 +125,9 @@ ParseResult Repl::trySpecialCase(QString line)
 	return false;
 }
 
-ParseResult Repl::tryEvaluate(QString line, QList<AstNode> *expr)
+ParseResult Repl::tryEvaluate(Parser &parser, QList<AstNode> *expr)
 {
-	Parser parser(line);
-	Function func;
+    Function func;
 
 	ParseResult ret;
 

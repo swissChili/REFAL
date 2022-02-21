@@ -19,7 +19,7 @@ protected:
 	QString readLine();
 	void addHistory(QString line);
 	ParseResult trySpecialCase(QString line);
-	ParseResult tryEvaluate(QString line, QList<AstNode> *expr);
+    ParseResult tryEvaluate(Parser &parser, QList<AstNode> *expr);
 
 	Evaluator _eval;
 
