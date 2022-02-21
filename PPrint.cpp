@@ -24,3 +24,8 @@ QString pprint(ParseResult val, const Parser &parser)
 
     return val.message() + " at " + val.pos() + "\n" + highlighted;
 }
+
+void eout(QString string)
+{
+    QTextStream(stderr) << string << '\n';
+}

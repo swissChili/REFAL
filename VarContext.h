@@ -4,7 +4,8 @@
 #include <QDebug>
 #include "Token.h"
 
-class VarContext {
+class VarContext
+{
 public:
     VarContext() = default;
     VarContext(VarContext const &other)  noexcept;
@@ -19,7 +20,8 @@ public:
     friend QDebug &operator <<(QDebug &debug, const VarContext &ctx);
 
 private:
-    struct Var {
+    struct Var
+    {
         Var() = default;
 
         char t = 0;

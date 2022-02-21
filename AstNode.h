@@ -7,7 +7,7 @@ class AstNode : public TokenBase<AstNode>
 public:
     using TokenBase::TokenBase;
 
-    explicit AstNode(QString function, QList<AstNode> args);
+    AstNode(QString function, QList<AstNode> args);
 
     enum
     {

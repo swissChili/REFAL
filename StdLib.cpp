@@ -3,15 +3,17 @@
 
 StdLib::StdLib()
 {
-	_print.addNativeSentence("e.Expr", [](QList<Token> args)
+    _print.addNativeSentence("e.Expr", [](VarContext args)
 	{
-		sout(pprint(args));
-		return args;
+        auto expr = args.expressionVar("Expr");
+        sout(pprint(args.expressionVar("Expr")));
+        return expr;
 	});
 
-	_prout.addNativeSentence("e.Expr", [](QList<Token> args)
+    _prout.addNativeSentence("e.Expr", [](VarContext args)
 	{
-		sout(pprint(std::move(args)));
+        auto expr = args.expressionVar("Expr");
+        sout(pprint(expr));
 		return QList<Token>();
 	});
 }

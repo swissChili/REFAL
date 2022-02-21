@@ -10,11 +10,11 @@
 template <typename T>
 QString pprint(T val);
 
-template <>
-QString pprint<Token>(Token val);
+//template <>
+//QString pprint<Token>(Token val);
 
-template <>
-QString pprint<AstNode>(AstNode val);
+//template <>
+//QString pprint<AstNode>(AstNode val);
 
 template <typename T>
 QString pprint(QList<T> val)
@@ -36,3 +36,4 @@ QString pprint(T val)
 QString pprint(ParseResult val, const Parser &parser);
 
 void sout(QString string);
+void eout(QString string);

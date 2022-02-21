@@ -2,8 +2,10 @@
 
 #include "Token.h"
 #include "AstNode.h"
+#include "VarContext.h"
+#include "Matcher.h"
 
-using SentenceResultFn = std::function<QList<Token> (QList<Token>)>;
+using SentenceResultFn = std::function<QList<Token> (VarContext)>;
 
 class Sentence {
 public:
@@ -13,7 +15,7 @@ public:
 	Sentence(QList<Token> pattern, SentenceResultFn result);
 
 	bool isExternal() const;
-	QList<Token> externResult(QList<Token> args) const;
+    QList<Token> externResult(MatchResult args) const;
 
 	QList<Token> pattern() const;
 	QList<AstNode> result() const;

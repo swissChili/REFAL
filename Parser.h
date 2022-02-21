@@ -76,6 +76,9 @@ public:
     ParseResult parseMany(QList<T> *list);
 
     template <typename T>
+    ParseResult parseString(QList<T> *list);
+
+    template <typename T>
     ParseResult parseOne(T *node);
 
     ParseResult parseSentence(Sentence *sentence);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMap>
+#include <QStack>
 
 #include "Token.h"
 #include "AstNode.h"
@@ -36,4 +37,12 @@ public:
 
 private:
 	QMap<QString, Function> _functions;
+    QMap<QString, QStack<QList<Token>>> _vars;
+
+protected:
+    QList<Token> dig(QString name);
+    QList<Token> copy(QString name);
+    void bury(QString name, QList<Token> expression);
 };
+
+void rtError(QString brief, QString details);

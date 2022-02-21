@@ -2,6 +2,7 @@
 #include "Function.h"
 #include "Matcher.h"
 #include "VarContext.h"
+#include "PPrint.h"
 
 #include <QDebug>
 
@@ -38,6 +39,40 @@ RuntimeResult::operator QString() const
 
 Evaluator::Evaluator()
 {
+    Function buryFn("Br");
+    buryFn.addNativeSentence("s.Name '=' e.Expr", [this](VarContext args)
+    {
+        Token name = args.singleVar("Name");
+        if (name.type() != Token::IDENT)
+            rtError("Invalid argument", "First argument to <Br> must be an identifier, received " + pprint(name));
+
+        bury(name.name(), args.expressionVar("Expr"));
+
+        return QList<Token>();
+    });
+    addFunction(buryFn);
+
+    Function digFn("Dg");
+    digFn.addNativeSentence("s.Name", [this](VarContext args)
+    {
+        Token name = args.singleVar("Name");
+        if (name.type() != Token::IDENT)
+            rtError("Invalid argument", "First argument to <Dg> must be an identifier, received " + pprint(name));
+
+        return dig(name.name());
+    });
+    addFunction(digFn);
+
+    Function copyFn("Cp");
+    copyFn.addNativeSentence("s.Name", [this](VarContext args)
+    {
+        Token name = args.singleVar("Name");
+        if (name.type() != Token::IDENT)
+            rtError("Invalid argument", "First argument to <Cp> must be an identifier, received " + pprint(name));
+
+        return copy(name.name());
+    });
+    addFunction(copyFn);
 }
 
 void Evaluator::addFunction(Function func)
@@ -132,7 +167,7 @@ RuntimeResult Evaluator::callFunction(QString name, QList<Token> args)
 
 		if (sentence.isExternal())
 		{
-			return RuntimeResult(sentence.externResult(args));
+            return RuntimeResult(sentence.externResult(res));
 		}
 
 		QList<Token> final;
@@ -148,5 +183,52 @@ RuntimeResult Evaluator::callFunction(QString name, QList<Token> args)
 		return RuntimeResult(final);
 	}
 
-	return RuntimeResult("Function " + name + " had no matching sentences for input");
+    return RuntimeResult("Function " + name + " had no matching sentences for input");
+}
+
+QList<Token> Evaluator::dig(QString name)
+{
+    if (_vars.contains(name))
+    {
+        QList<Token> value = _vars[name].pop();
+
+        if (_vars[name].empty())
+        {
+            _vars.remove(name);
+        }
+
+        return value;
+    }
+    else
+    {
+        return {};
+    }
+}
+
+QList<Token> Evaluator::copy(QString name)
+{
+    if (_vars.contains(name))
+    {
+        return _vars[name].last();
+    }
+    else
+    {
+        return {};
+    }
+}
+
+void Evaluator::bury(QString name, QList<Token> expression)
+{
+    if (!_vars.contains(name))
+    {
+        _vars[name] = QStack<QList<Token>>();
+    }
+
+    _vars[name].push(expression);
+}
+
+void rtError(QString brief, QString details)
+{
+    eout("Runtime Error: " + brief);
+    eout(details);
 }

@@ -83,12 +83,17 @@ void testEval(QString function, QString expression, QString expected)
 	}
 
 end:
-	qDebug() << "\033[36mEvaluate\033[0m" << function << expression << "->" << result;
+    qDebug() << "\033[36mEvaluate\033[0m" << function << expression << "->" << pprint(result);
 }
 
 void testEval(QString function, QString expression, QList<Token> expected)
 {
 	testEval(function, expression, pprint(expected));
+}
+
+void testEval(QString expression, QString expected)
+{
+    testEval("", expression, expected);
 }
 
 void testMatch(const QString &test, bool shouldBe, const MatchResult &result)
@@ -236,6 +241,8 @@ void testAllParses()
 	testParseAst("123", {AstNode("123", 10)});
 	testParseAst("12 00", {AstNode::fromInteger(12), AstNode::fromInteger(0)});
     testParseAst("s.A s.B", {AstNode('s', "A"), AstNode('s', "B")});
+    testParseAst("a '=' b", {AstNode('a'), AstNode('='), AstNode('b')});
+    testParseAst("'This\\'<>#$@#^%\\n' 'another $3543543'");
 }
 
 void testAllFunctionDefs()
@@ -248,6 +255,8 @@ void testAllEvals()
 {
 	testEval("First {s.A e.Rest = s.A;}", "<First hello>", "h");
 	testEval("Number { = 123; }", "<Number>", QList<Token>{Token::fromInteger(123)});
+    testEval("<Br Name '=' Jim> <Dg Name>", "Jim");
+    testEval("<Br A '=' hello> <Br A '=' 'good bye'> <Dg A> <Dg A>", "'good byehello'");
 }
 
 int main(int argc, char *argv[])

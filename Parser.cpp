@@ -196,19 +196,27 @@ ParseResult Parser::parseVariable(T *node)
 template <typename T>
 ParseResult Parser::parseMany(QList<T> *list)
 {
-    QList<T> nodes;
+    QList<T> nodes, string;
     T next;
-	ParseResult ret;
+    ParseResult ret, stringRet;
 
-    while ((ret = parseOne(&next)))
+    while ((ret = parseOne(&next)) || (stringRet = parseString(&string)))
     {
-        nodes.append(next);
+        if (ret)
+            nodes.append(next);
+        else if (stringRet)
+            nodes.append(string);
+
+        // So that we can check if anything was incomplete recently at the end
+        ret = stringRet = false;
     }
 
 	*list = nodes;
 
 	if (ret.status() == ParseResult::INCOMPLETE)
 		return ret;
+    else if (stringRet.status() == ParseResult::INCOMPLETE)
+        return ret;
 	else
 		return true;
 }
@@ -422,4 +430,48 @@ ParseResult Parser::parseFunctionDefinition(Function *function)
 ParsePos::operator QString()
 {
     return QString::number(line) + ":" + QString::number(lineOffset);
+}
+
+template <typename T>
+ParseResult Parser::parseString(QList<T> *list)
+{
+    skip();
+
+    ParsePos pos = save();
+
+    if (peek() != '\'')
+        return false;
+
+    get();
+
+    list->clear();
+
+    while (peek() != 0 && peek() != '\'')
+    {
+        QChar c = get();
+        if (c == '\\')
+        {
+            QChar next = get();
+            QString conversions = "''n\nt\tr\r";
+
+            for (int i = 0; i < conversions.size(); i += 2)
+            {
+                if (next == conversions[i])
+                    list->append(T(conversions[i + 1]));
+            }
+        }
+        else
+        {
+            list->append(T(c));
+        }
+    }
+
+    if (get() == 0)
+    {
+        ParseResult ret(ParseResult::INCOMPLETE, "Expected ' before end of input", save());
+        reset(pos);
+        return ret;
+    }
+
+    return true;
 }

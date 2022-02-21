@@ -36,9 +36,9 @@ bool Sentence::isExternal() const
 	return _native != nullptr;
 }
 
-QList<Token> Sentence::externResult(QList<Token> args) const
+QList<Token> Sentence::externResult(MatchResult args) const
 {
-	return _native(std::move(args));
+    return _native(args.context);
 }
 
 QList<Token> Sentence::pattern() const
