@@ -11,6 +11,12 @@
 #include "Repl.h"
 #include "PPrint.h"
 
+#ifdef NO_IDE
+using Application = QCoreApplication;
+#else
+#include "ide/IdeMain.h"
+#endif
+
 int g_numFailed = 0;
 
 
@@ -261,9 +267,9 @@ void testAllEvals()
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-	QCoreApplication::setApplicationName("REFAL");
-	QCoreApplication::setApplicationVersion("1.0-a1");
+    Application a(argc, argv);
+    a.setApplicationName("REFAL");
+    a.setApplicationVersion("1.0-a1");
 
 	QCommandLineParser cli;
 	cli.setApplicationDescription("REFAL interpreter");
@@ -274,6 +280,8 @@ int main(int argc, char *argv[])
 
 	QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite.");
 	cli.addOption(testOption);
+    QCommandLineOption replOption(QStringList({"r", "repl"}), "Start CLI REPL");
+    cli.addOption(replOption);
 
 	cli.process(a);
 
@@ -295,9 +303,13 @@ int main(int argc, char *argv[])
 
 		return testResults();
 	}
-	else
+    else if (cli.isSet(replOption))
 	{
 		Repl repl;
 		repl.start();
 	}
+    else
+    {
+        return ideMain(&a);
+    }
 }
