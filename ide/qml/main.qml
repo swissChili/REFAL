@@ -3,6 +3,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.0
 import QtQuick.Layouts 1.3
 
+import sh.swisschili.REFAL 1.0
+
 ApplicationWindow {
     id: root
     width: 1080
@@ -10,8 +12,18 @@ ApplicationWindow {
     title: "Notebook"
     visible: true
 
-    Material.theme: Material.Dark
+    Material.theme: Material.Light
     Material.accent: Material.Orange
+
+    CellModel {
+        id: model
+    }
+
+    Component.onCompleted: {
+        model.addCell("Refal { = Hi!; }", "");
+        model.addCell("<Refal>", "Hi!");
+        model.addCell("Hello there", "Hello there");
+    }
 
     ColumnLayout {
         id: column
@@ -45,10 +57,10 @@ ApplicationWindow {
                 id: codeEditor
                 SplitView.fillWidth: true
                 SplitView.minimumWidth: 400
-                model: 3
+                model: model
                 clip: true
 
-                delegate: Cell {
+                delegate: NotebookCell {
                     width: codeEditor.width - 5
                 }
             }

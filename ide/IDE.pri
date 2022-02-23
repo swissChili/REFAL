@@ -1,7 +1,7 @@
 QT += quick quickcontrols2
 QT -= core
 
-CONFIG +=
+CONFIG += qmltypes
 
 QML_IMPORT_NAME = sh.swisschili.REFAL
 QML_IMPORT_MAJOR_VERSION = 1
@@ -14,10 +14,16 @@ QML_IMPORT_PATH =
 QML_DESIGNER_IMPORT_PATH =
 
 SOURCES += \
+    $$PWD/Cell.cpp \
+    $$PWD/CellModel.cpp \
     $$PWD/IdeMain.cpp
 
 HEADERS += \
+    $$PWD/Cell.h \
+    $$PWD/CellModel.h \
     $$PWD/IdeMain.h
 
 RESOURCES += \
     $$PWD/resources.qrc
+
+INCLUDEPATH += $$PWD

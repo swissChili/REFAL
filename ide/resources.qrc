@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/main.qml</file>
-        <file>qml/Cell.qml</file>
+        <file>qml/NotebookCell.qml</file>
         <file>icons/play-circle.svg</file>
         <file>icons/add.svg</file>
         <file>qml/InsertRow.qml</file>

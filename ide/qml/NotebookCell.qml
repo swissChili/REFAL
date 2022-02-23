@@ -6,6 +6,9 @@ import QtQuick.Layouts 1.0
 ColumnLayout {
     id: root
 
+    required property string code
+    required property string result
+
     RowLayout {
         Layout.fillWidth: true
 
@@ -25,15 +28,21 @@ ColumnLayout {
                 Layout.fillHeight: true
                 id: code
                 font.family: "monospace"
-                text: "Hello"
+                text: root.code
                 selectByMouse: true
                 wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
+
+                Keys.onTabPressed: {
+                    var pos = cursorPosition + 4
+                    text += "    ";
+                    cursorPosition = pos
+                }
             }
 
             Label {
                 Layout.fillWidth: true
                 font.family: "monospace"
-                text: "Result\nasdfasdf\nasdad"
+                text: root.result
             }
         }
     }
