@@ -16,12 +16,14 @@ QML_DESIGNER_IMPORT_PATH =
 SOURCES += \
     $$PWD/Cell.cpp \
     $$PWD/CellModel.cpp \
-    $$PWD/IdeMain.cpp
+    $$PWD/IdeMain.cpp \
+    $$PWD/Notebook.cpp
 
 HEADERS += \
     $$PWD/Cell.h \
     $$PWD/CellModel.h \
-    $$PWD/IdeMain.h
+    $$PWD/IdeMain.h \
+    $$PWD/Notebook.h
 
 RESOURCES += \
     $$PWD/resources.qrc

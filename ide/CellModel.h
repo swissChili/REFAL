@@ -3,16 +3,16 @@
 #include <QAbstractListModel>
 #include <qqml.h>
 
+#include "Notebook.h"
 #include "Cell.h"
 
 class CellModel : public QAbstractListModel
 {
     Q_OBJECT
-    QML_ELEMENT
 
 public:
-    explicit CellModel(QObject *parent = nullptr);
-    CellModel(const CellModel &model, QObject *parent = nullptr);
+    explicit CellModel(Notebook *parent = nullptr);
+    CellModel(const CellModel &other);
 
     enum CellRoles
     {
@@ -43,7 +43,8 @@ public:
     Q_INVOKABLE void addCell(QString code, QString result);
 
 private:
-    QList<Cell> _cells;
+    Notebook *_notebook;
 };
 
 Q_DECLARE_METATYPE(CellModel)
+Q_DECLARE_METATYPE(CellModel *)

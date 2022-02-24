@@ -3,6 +3,8 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 
+#include "CellModel.h"
+
 int ideMain(QGuiApplication *app)
 {
     QQmlApplicationEngine engine;
@@ -11,6 +13,9 @@ int ideMain(QGuiApplication *app)
     // registerTypes(&engine);
 
     QQuickStyle::setStyle("Material");
+
+    qRegisterMetaType<CellModel>();
+    qRegisterMetaType<CellModel *>();
 
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

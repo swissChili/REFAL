@@ -6,6 +6,8 @@ import QtQuick.Layouts 1.0
 Rectangle {
     id: root
 
+    signal insertClicked()
+
     color: Material.color(Material.Grey, Material.theme == Material.Dark ? Material.Shade800 : Material.Shade300)
     height: 2
     Layout.fillWidth: true
@@ -51,12 +53,14 @@ Rectangle {
         height: 24
         width: 24
 
-        Button {
+        RoundButton {
             id: addButton
             anchors.centerIn: parent
             icon.source: "qrc:///icons/add.svg"
             icon.color: Material.color(Material.Grey, Material.theme == Material.Dark ? Material.Shade400 : Material.Shade600)
             flat: true
+
+            onClicked: root.insertClicked()
         }
     }
 }

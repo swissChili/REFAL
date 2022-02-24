@@ -1,14 +1,14 @@
 #include "CellModel.h"
 
-CellModel::CellModel(QObject *parent)
+CellModel::CellModel(Notebook *parent)
     : QAbstractListModel(parent)
+    , _notebook(parent)
 {
 }
 
-CellModel::CellModel(const CellModel &model, QObject *parent)
-    : CellModel(parent)
+CellModel::CellModel(const CellModel &other)
+    : CellModel(other._notebook)
 {
-    _cells = model._cells;
 }
 
 int CellModel::rowCount(const QModelIndex &parent) const
@@ -18,7 +18,7 @@ int CellModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return _cells.size();
+    return _notebook->_cells.size();
 }
 
 QVariant CellModel::data(const QModelIndex &index, int role) const
@@ -29,9 +29,9 @@ QVariant CellModel::data(const QModelIndex &index, int role) const
     switch (role)
     {
     case CodeRole:
-        return _cells[index.row()].code();
+        return _notebook->_cells[index.row()].code();
     case ResultRole:
-        return _cells[index.row()].result();
+        return _notebook->_cells[index.row()].result();
     default:
         return QVariant();
     }
@@ -44,10 +44,10 @@ bool CellModel::setData(const QModelIndex &index, const QVariant &value, int rol
         switch (role)
         {
         case CodeRole:
-            _cells[index.row()].setCode(value.toString());
+            _notebook->_cells[index.row()].setCode(value.toString());
             break;
         case ResultRole:
-            _cells[index.row()].setResult(value.toString());
+            _notebook->_cells[index.row()].setResult(value.toString());
             break;
         default:
             return false;
@@ -74,7 +74,7 @@ bool CellModel::insertRows(int row, int count, const QModelIndex &parent)
     beginInsertRows(parent, row, row + count - 1);
 
     for (int i = 0; i < count; i++)
-        _cells.insert(row, Cell());
+        _notebook->_cells.insert(row, Cell());
 
     endInsertRows();
 
@@ -86,7 +86,7 @@ bool CellModel::removeRows(int row, int count, const QModelIndex &parent)
     beginRemoveRows(parent, row, row + count - 1);
 
     for (int i = 0; i < count; i++)
-        _cells.removeAt(row);
+        _notebook->_cells.removeAt(row);
 
     endRemoveRows();
 
@@ -103,11 +103,11 @@ QHash<int, QByteArray> CellModel::roleNames() const
 
 void CellModel::addCell(const Cell &cell)
 {
-    int i = _cells.size();
+    int i = _notebook->_cells.size();
 
     insertRows(i, 1, QModelIndex());
 
-    _cells[i] = cell;
+    _notebook->_cells[i] = cell;
     emit dataChanged(index(i), index(i), {CodeRole, ResultRole});
 }
 

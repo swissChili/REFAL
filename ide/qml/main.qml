@@ -15,14 +15,14 @@ ApplicationWindow {
     Material.theme: Material.Light
     Material.accent: Material.Orange
 
-    CellModel {
-        id: model
+    Notebook {
+        id: notebook
     }
 
     Component.onCompleted: {
-        model.addCell("Refal { = Hi!; }", "");
-        model.addCell("<Refal>", "Hi!");
-        model.addCell("Hello there", "Hello there");
+        notebook.cellModel.addCell("Refal { = Hi!; }", "");
+        notebook.cellModel.addCell("<Refal>", "Hi!");
+        notebook.cellModel.addCell("Hello there", "Hello there");
     }
 
     ColumnLayout {
@@ -36,14 +36,17 @@ ApplicationWindow {
 
             TabButton {
                 text: "Example Workspace"
+                width: implicitWidth
             }
 
             TabButton {
                 text: "Another Workspace"
+                width: implicitWidth
             }
 
             TabButton {
                 text: "Testing"
+                width: implicitWidth
             }
         }
 
@@ -57,11 +60,26 @@ ApplicationWindow {
                 id: codeEditor
                 SplitView.fillWidth: true
                 SplitView.minimumWidth: 400
-                model: model
+                model: notebook.cellModel
                 clip: true
 
                 delegate: NotebookCell {
+                    id: notebookCell
+
+                    required property var model
+                    required property var index
+
                     width: codeEditor.width - 5
+
+                    code: model.code
+                    result: model.result
+
+                    onCodeEditingFinished: model.code = code
+
+                    onInsertBelowClicked: {
+                        console.info(index)
+                        cellModel.insertRows(cellModel.index(0, index), 1)
+                    }
                 }
             }
 
