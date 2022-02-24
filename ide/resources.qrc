@@ -6,5 +6,7 @@
         <file>icons/add.svg</file>
         <file>qml/InsertRow.qml</file>
         <file>icons/trash.svg</file>
+        <file>qml/DocumentPadding.qml</file>
+        <file>icons/square.svg</file>
     </qresource>
 </RCC>

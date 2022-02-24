@@ -36,6 +36,8 @@ public:
 	QString message() const;
 	int status() const;
 
+    operator QString() const;
+
 private:
 	int _status = COMPLETE;
 	QString _message = "";

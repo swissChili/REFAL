@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "PPrint.h"
 
 #include <QDebug>
 
@@ -34,7 +35,12 @@ QString ParseResult::message() const
 
 int ParseResult::status() const
 {
-	return _status;
+    return _status;
+}
+
+ParseResult::operator QString() const
+{
+    return pprint(pos()) + "\n" + message();
 }
 
 Parser::Parser(QString input)

@@ -3,6 +3,7 @@
 #include <QObject>
 
 #include "Cell.h"
+#include "NbRuntime.h"
 
 class CellModel;
 
@@ -19,14 +20,25 @@ public:
 
     CellModel *cellModel();
 
+    Q_INVOKABLE void runCell(QUuid uuid);
+    Q_INVOKABLE void quitCell(QUuid uuid);
+
 signals:
     void cellModelChanged();
+
+protected slots:
+    void cellFinishedRunning(Cell *cell, RuntimeResult result);
+    void cellFailedToParse(Cell *cell, ParseResult result);
+    void cellWaiting(Cell *cell);
+    void cellRunning(Cell *cell);
+    void cellQuit(Cell *cell);
 
 protected:
     friend class CellModel;
 
-    QList<Cell> _cells;
+    QList<Cell *> _cells;
     CellModel *_cellModel;
+    NbRuntime _rt;
 };
 
 Q_DECLARE_METATYPE(Notebook)

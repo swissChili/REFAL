@@ -5,6 +5,7 @@
 #include "PPrint.h"
 
 #include <QDebug>
+#include <QCoreApplication>
 
 RuntimeResult::RuntimeResult(QList<Token> result)
 {
@@ -14,7 +15,41 @@ RuntimeResult::RuntimeResult(QList<Token> result)
 RuntimeResult::RuntimeResult(QString message)
 {
 	_errorMessage = message;
-	_success = false;
+    _success = false;
+}
+
+RuntimeResult &RuntimeResult::operator =(const RuntimeResult &other)
+{
+    _errorMessage = other._errorMessage;
+    _success = other._success;
+    _result = other._result;
+
+    return *this;
+}
+
+RuntimeResult RuntimeResult::operator +(const RuntimeResult &other)
+{
+    RuntimeResult res;
+
+    if (_success)
+    {
+        res._success = other._success;
+        res._result = _result;
+        res._result.append(other._result);
+        res._errorMessage = other._errorMessage;
+    }
+    else
+    {
+        res = *this;
+    }
+
+    return res;
+}
+
+RuntimeResult &RuntimeResult::operator +=(const RuntimeResult &other)
+{
+    *this = *this + other;
+    return *this;
 }
 
 bool RuntimeResult::success() const
@@ -34,7 +69,7 @@ QList<Token> RuntimeResult::result() const
 
 RuntimeResult::operator QString() const
 {
-	return QString(_success) + " " + _errorMessage;
+    return _errorMessage + pprint(_result);
 }
 
 Evaluator::Evaluator()
@@ -73,6 +108,19 @@ Evaluator::Evaluator()
         return copy(name.name());
     });
     addFunction(copyFn);
+
+    Function undefFn("Undef");
+    undefFn.addNativeSentence("s.Name", [this](VarContext args)
+    {
+        Token name = args.singleVar("Name");
+        if (name.type() != Token::IDENT)
+            rtError("Invalid argument", "First argument to <Undef> must be an identifier, received " + pprint(name));
+
+        clearFunction(name.name());
+
+        return QList<Token>();
+    });
+    addFunction(undefFn);
 }
 
 void Evaluator::addFunction(Function func)
@@ -85,8 +133,13 @@ void Evaluator::clearFunction(QString name)
 	_functions.remove(name);
 }
 
-RuntimeResult Evaluator::evaluate(AstNode node, VarContext ctx)
+RuntimeResult Evaluator::evaluate(AstNode node, VarContext ctx, int recursionDepth)
 {
+    if (recursionDepth > _recursionLimit)
+    {
+        throw StackOverflowException(node);
+    }
+
 	if (node.isSym())
 	{
 		return RuntimeResult(QList<Token>{Token(node.symbol())});
@@ -138,20 +191,20 @@ RuntimeResult Evaluator::evaluate(AstNode node, VarContext ctx)
 
 		for (const AstNode &arg : node.funcArgs())
 		{
-			RuntimeResult internalResult = evaluate(arg, ctx);
+            RuntimeResult internalResult = evaluate(arg, ctx, recursionDepth + 1);
 			if (!internalResult.success())
 				return internalResult;
 
 			args.append(internalResult.result());
 		}
 
-		return callFunction(node.name(), args);
+        return callFunction(node.name(), args, recursionDepth + 1);
 	}
 
 	return RuntimeResult("#TYPE_ERROR");
 }
 
-RuntimeResult Evaluator::callFunction(QString name, QList<Token> args)
+RuntimeResult Evaluator::callFunction(QString name, QList<Token> args, int recursionDepth)
 {
 	if (!_functions.contains(name))
 		return RuntimeResult("Function " + name + " is not defined.");
@@ -173,7 +226,7 @@ RuntimeResult Evaluator::callFunction(QString name, QList<Token> args)
 		QList<Token> final;
 		for (const AstNode &node : sentence.result())
 		{
-			RuntimeResult argRes = evaluate(node, res.context);
+            RuntimeResult argRes = evaluate(node, res.context, recursionDepth);
 			if (!argRes.success())
 				return argRes;
 
@@ -184,6 +237,11 @@ RuntimeResult Evaluator::callFunction(QString name, QList<Token> args)
 	}
 
     return RuntimeResult("Function " + name + " had no matching sentences for input");
+}
+
+void Evaluator::quit()
+{
+    throw EvalQuitException();
 }
 
 QList<Token> Evaluator::dig(QString name)
@@ -231,4 +289,40 @@ void rtError(QString brief, QString details)
 {
     eout("Runtime Error: " + brief);
     eout(details);
+}
+
+void EvalQuitException::raise() const
+{
+    throw *this;
+}
+
+EvalQuitException *EvalQuitException::clone() const
+{
+    return new EvalQuitException(*this);
+}
+
+StackOverflowException::StackOverflowException(AstNode failedAt)
+    : QException()
+{
+    _failedAt = failedAt;
+}
+
+AstNode StackOverflowException::failedAt() const
+{
+    return _failedAt;
+}
+
+void StackOverflowException::raise() const
+{
+    throw *this;
+}
+
+StackOverflowException *StackOverflowException::clone() const
+{
+    return new StackOverflowException(*this);
+}
+
+StackOverflowException::operator QString() const
+{
+    return "StackOverflowException: at " + pprint(_failedAt);
 }

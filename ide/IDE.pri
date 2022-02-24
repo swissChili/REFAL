@@ -17,12 +17,14 @@ SOURCES += \
     $$PWD/Cell.cpp \
     $$PWD/CellModel.cpp \
     $$PWD/IdeMain.cpp \
+    $$PWD/NbRuntime.cpp \
     $$PWD/Notebook.cpp
 
 HEADERS += \
     $$PWD/Cell.h \
     $$PWD/CellModel.h \
     $$PWD/IdeMain.h \
+    $$PWD/NbRuntime.h \
     $$PWD/Notebook.h
 
 RESOURCES += \

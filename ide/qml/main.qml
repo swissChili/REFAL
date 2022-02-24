@@ -63,22 +63,47 @@ ApplicationWindow {
                 model: notebook.cellModel
                 clip: true
 
+                header: ColumnLayout {
+                    width: codeEditor.width
+
+                    DocumentPadding {
+                        Layout.bottomMargin: 0
+
+                        Label {
+                            font.pointSize: 18
+                            text: "Notebook"
+                        }
+                    }
+
+                    InsertRow {
+                        onInsertClicked: notebook.cellModel.insertRows(notebook.cellModel.index(0, 0), 1);
+                    }
+                }
+
                 delegate: NotebookCell {
                     id: notebookCell
 
                     required property var model
                     required property var index
+                    required property var uuid
+                    required property int status
 
                     width: codeEditor.width - 5
 
                     code: model.code
-                    result: model.result
+                    result: model.result.trim()
+                    status: model.status
 
                     onCodeEditingFinished: model.code = code
 
                     onInsertBelowClicked: {
-                        console.info(index)
-                        cellModel.insertRows(cellModel.index(0, index), 1)
+                        console.info(index);
+                        notebook.cellModel.insertRows(notebook.cellModel.index(index + 1, 0), 1);
+                    }
+
+                    onRunClicked: {
+                        console.info("Cell run clicked")
+                        notebook.runCell(uuid)
                     }
                 }
             }

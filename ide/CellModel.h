@@ -17,7 +17,9 @@ public:
     enum CellRoles
     {
         CodeRole = Qt::UserRole + 1,
-        ResultRole
+        ResultRole,
+        UuidRole,
+        StatusRole,
     };
 
     // Basic functionality:
@@ -44,6 +46,7 @@ public:
 
 private:
     Notebook *_notebook;
+    void announceCellChange(Cell *cell, int role);
 };
 
 Q_DECLARE_METATYPE(CellModel)

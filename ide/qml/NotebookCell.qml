@@ -3,15 +3,19 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.0
 import QtQuick.Layouts 1.0
 
+import sh.swisschili.REFAL 1.0
+
 Item {
     id: root
 
     required property string code
     required property string result
+    property int status: Cell.IDLE
 
     signal insertBelowClicked()
     signal codeEditingFinished(string code)
     signal cellFocused()
+    signal runClicked()
 
     height: column.height
 
@@ -34,9 +38,18 @@ Item {
 
             RoundButton {
                 Layout.alignment: Qt.AlignTop
-                icon.source: "qrc:///icons/play-circle.svg"
+                icon.source: iconForState(root.state)
                 icon.color: Material.color(Material.Grey, Material.Shade600)
                 flat: true
+
+                onClicked: root.runClicked()
+
+                function iconForState(state) {
+                    if (state === Cell.RUNNING)
+                        return "qrc:///icons/square.svg"
+
+                    return "qrc:///icons/play-circle.svg"
+                }
             }
 
             ColumnLayout {
