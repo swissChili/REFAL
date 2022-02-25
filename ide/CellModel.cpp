@@ -152,6 +152,11 @@ void CellModel::insertCellBefore(int index)
     insertRow(index);
 }
 
+void CellModel::deleteCellAt(int index)
+{
+    removeRow(index);
+}
+
 void CellModel::announceCellChange(Cell *cell, int role)
 {
     // TODO: Optimize

@@ -11,89 +11,128 @@ Item {
     required property string code
     required property string result
     property int status: Cell.IDLE
+    property bool cellActive: false
 
     signal insertBelowClicked()
     signal codeEditingFinished(string code)
     signal cellFocused()
+    signal cellUnfocused()
     signal runClicked()
+    signal deleteClicked()
 
     height: column.height
 
-    MouseArea {
-        id: selectCell
-
-        anchors.fill: column
-
-        onClicked: root.cellFocused()
-    }
+    Keys.onEscapePressed: root.cellUnfocused()
 
     ColumnLayout {
         id: column
 
-        width: parent.width
+        width: parent.width - 20
+        anchors.centerIn: parent
 
-        RowLayout {
-            id: row
+        Item {
+            implicitWidth: row.implicitWidth
+            implicitHeight: row.implicitHeight
             Layout.fillWidth: true
 
-            RoundButton {
-                Layout.alignment: Qt.AlignTop
-                icon.source: iconForState(root.state)
-                icon.color: Material.color(Material.Grey, Material.Shade600)
-                flat: true
+            Pane {
+                anchors.fill: parent
+                anchors.topMargin: -5
+                anchors.bottomMargin: -5
 
-                onClicked: root.runClicked()
-
-                function iconForState(state) {
-                    if (state === Cell.RUNNING)
-                        return "qrc:///icons/square.svg"
-
-                    return "qrc:///icons/play-circle.svg"
-                }
+                Material.elevation: root.cellActive ? 4 : 0
             }
 
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            MouseArea {
+                id: selectCell
 
-                TextArea {
+                anchors.fill: row
+
+                onClicked: root.cellFocused()
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                id: row
+
+                RoundButton {
+                    Layout.alignment: Qt.AlignTop
+                    icon.source: iconForState(root.state)
+                    icon.color: Material.color(Material.Grey, Material.Shade600)
+                    flat: true
+
+                    onClicked: root.runClicked()
+
+                    function iconForState(state) {
+                        if (state === Cell.RUNNING)
+                            return "qrc:///icons/square.svg"
+
+                        return "qrc:///icons/play-circle.svg"
+                    }
+                }
+
+                ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    id: code
-                    font.family: "monospace"
-                    text: root.code
-                    selectByMouse: true
-                    wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
 
-                    Keys.onTabPressed: {
-                        var pos = cursorPosition + 4
-                        text = text.slice(0, cursorPosition) + "    " + text.slice(cursorPosition);
-                        cursorPosition = pos
+                    TextArea {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        id: code
+                        font.family: "monospace"
+                        text: root.code
+                        selectByMouse: true
+                        wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
+
+                        placeholderText: "Write some code..."
+
+                        Keys.onTabPressed: {
+                            var pos = cursorPosition + 4
+                            text = text.slice(0, cursorPosition) + "    " + text.slice(cursorPosition);
+                            cursorPosition = pos
+                        }
+
+//                        Keys.onEscapePressed: {
+//                            focus = false
+//                        }
+
+                        onEditingFinished: {
+                            root.codeEditingFinished(text)
+                        }
+
+                        onFocusChanged: if (focus) root.cellFocused()
+                        onActiveFocusChanged: if (activeFocus) root.cellFocused()
                     }
 
-                    Keys.onEscapePressed: {
-                        root.forceActiveFocus()
-                    }
+                    Label {
+                        visible: root.result.length > 0
+                        Layout.fillWidth: true
+                        font.family: "monospace"
+                        text: root.result
 
-                    onEditingFinished: {
-                        root.codeEditingFinished(text)
+                        Layout.bottomMargin: 5
                     }
-
-                    onFocusChanged: if (focus) root.cellFocused()
                 }
 
-                Label {
-                    visible: root.result.length > 0
-                    Layout.fillWidth: true
-                    font.family: "monospace"
-                    text: root.result
-                }
-            }
+                RoundButton {
+                    icon.source: "qrc:///icons/menu.svg"
+                    icon.color: Constants.buttonGrey
+                    flat: true
 
-            RoundButton {
-                icon.source: "qrc:///icons/trash.svg"
-                icon.color: Material.color(Material.Grey, Material.theme == Material.Dark ? Material.Shade400 : Material.Shade600)
-                flat: true
+                    onClicked: cellContextMenu.popup()
+
+                    Menu {
+                        id: cellContextMenu
+
+                        MenuItem {
+                            icon.source: "qrc:///icons/trash.svg"
+                            icon.color: Material.color(Material.Red)
+                            text: "Delete"
+
+                            onClicked: root.deleteClicked()
+                        }
+                    }
+                }
             }
         }
 

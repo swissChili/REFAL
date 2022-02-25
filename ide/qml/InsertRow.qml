@@ -57,7 +57,7 @@ Rectangle {
             id: addButton
             anchors.centerIn: parent
             icon.source: "qrc:///icons/add.svg"
-            icon.color: Material.color(Material.Grey, Material.theme == Material.Dark ? Material.Shade400 : Material.Shade600)
+            icon.color: Constants.buttonGrey
             flat: true
 
             onClicked: root.insertClicked()

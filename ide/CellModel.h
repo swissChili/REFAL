@@ -45,6 +45,7 @@ public:
     Q_INVOKABLE void addCell(QString code, QString result);
 
     Q_INVOKABLE void insertCellBefore(int index);
+    Q_INVOKABLE void deleteCellAt(int index);
 
 private:
     Notebook *_notebook;

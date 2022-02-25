@@ -6,7 +6,10 @@
         <file>icons/add.svg</file>
         <file>qml/InsertRow.qml</file>
         <file>icons/trash.svg</file>
-        <file>qml/DocumentPadding.qml</file>
         <file>icons/square.svg</file>
+        <file>icons/menu.svg</file>
+        <file>qml/Constants.qml</file>
+        <file>qml/qmldir</file>
+        <file>qml/qtquickcontrols2.conf</file>
     </qresource>
 </RCC>

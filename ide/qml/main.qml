@@ -19,12 +19,6 @@ ApplicationWindow {
         id: notebook
     }
 
-    Component.onCompleted: {
-        notebook.cellModel.addCell("Refal { = Hi!; }", "");
-        notebook.cellModel.addCell("<Refal>", "Hi!");
-        notebook.cellModel.addCell("Hello there", "Hello there");
-    }
-
     ColumnLayout {
         id: column
         anchors.fill: parent
@@ -35,12 +29,12 @@ ApplicationWindow {
             Layout.fillWidth: true
 
             TabButton {
-                text: "Example Workspace"
+                text: "Notebook"
                 width: implicitWidth
             }
 
             TabButton {
-                text: "Another Workspace"
+                text: "Another Notebook"
                 width: implicitWidth
             }
 
@@ -63,10 +57,12 @@ ApplicationWindow {
                 model: notebook.cellModel
                 clip: true
 
+                spacing: 5
+
                 header: ColumnLayout {
                     width: codeEditor.width
 
-                    DocumentPadding {
+                    Pane {
                         Layout.bottomMargin: 0
 
                         Label {
@@ -87,11 +83,12 @@ ApplicationWindow {
                     required property var index
                     required property var uuid
 
-                    width: codeEditor.width - 5
+                    width: codeEditor.width
 
                     code: model.code
                     result: model.result.trim()
                     status: model.status
+                    cellActive: codeEditor.currentIndex === index
 
                     onCodeEditingFinished: model.code = code
 
@@ -103,6 +100,18 @@ ApplicationWindow {
                     onRunClicked: {
                         console.info("Cell run clicked")
                         notebook.runCell(uuid)
+                    }
+
+                    onCellFocused: {
+                        codeEditor.currentIndex = index
+                    }
+
+                    onDeleteClicked: {
+                        notebook.cellModel.deleteCellAt(index)
+                    }
+
+                    onCellUnfocused: {
+                        codeEditor.currentIndex = -1
                     }
                 }
             }
