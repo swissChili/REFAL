@@ -76,7 +76,7 @@ ApplicationWindow {
                     }
 
                     InsertRow {
-                        onInsertClicked: notebook.cellModel.insertRows(notebook.cellModel.index(0, 0), 1);
+                        onInsertClicked: notebook.cellModel.insertCellBefore(0)
                     }
                 }
 
@@ -86,7 +86,6 @@ ApplicationWindow {
                     required property var model
                     required property var index
                     required property var uuid
-                    required property int status
 
                     width: codeEditor.width - 5
 
@@ -98,7 +97,7 @@ ApplicationWindow {
 
                     onInsertBelowClicked: {
                         console.info(index);
-                        notebook.cellModel.insertRows(notebook.cellModel.index(index + 1, 0), 1);
+                        notebook.cellModel.insertCellBefore(index + 1);
                     }
 
                     onRunClicked: {

@@ -287,8 +287,7 @@ void Evaluator::bury(QString name, QList<Token> expression)
 
 void rtError(QString brief, QString details)
 {
-    eout("Runtime Error: " + brief);
-    eout(details);
+    throw AssertionException(brief + "\n" + details);
 }
 
 void EvalQuitException::raise() const
@@ -325,4 +324,30 @@ StackOverflowException *StackOverflowException::clone() const
 StackOverflowException::operator QString() const
 {
     return "StackOverflowException: at " + pprint(_failedAt);
+}
+
+AssertionException::AssertionException(QString message)
+    : QException()
+{
+    _message = message;
+}
+
+QString AssertionException::message() const
+{
+    return _message;
+}
+
+void AssertionException::raise() const
+{
+    throw *this;
+}
+
+AssertionException *AssertionException::clone() const
+{
+    return new AssertionException(*this);
+}
+
+AssertionException::operator QString() const
+{
+    return "AssertionException: " + _message;
 }

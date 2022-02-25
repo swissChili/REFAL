@@ -2,6 +2,8 @@
 #include "CellModel.h"
 #include "../PPrint.h"
 
+// TODO: avoid potential race condition if Cell is deleted, pass by value with same UUID instead
+
 Notebook::Notebook(QObject *parent)
     : QObject(parent)
     , _cellModel(new CellModel(this))

@@ -44,6 +44,8 @@ public:
     Q_INVOKABLE void addCell(const Cell &cell);
     Q_INVOKABLE void addCell(QString code, QString result);
 
+    Q_INVOKABLE void insertCellBefore(int index);
+
 private:
     Notebook *_notebook;
     void announceCellChange(Cell *cell, int role);

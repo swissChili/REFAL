@@ -59,6 +59,23 @@ private:
     AstNode _failedAt;
 };
 
+class AssertionException : public QException
+{
+public:
+    AssertionException(QString message = "");
+    AssertionException(const AssertionException &other) = default;
+
+    QString message() const;
+
+    void raise() const override;
+    AssertionException *clone() const override;
+
+    operator QString() const;
+
+private:
+    QString _message;
+};
+
 class Evaluator {
 public:
 	Evaluator();

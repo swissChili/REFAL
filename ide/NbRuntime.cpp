@@ -2,10 +2,12 @@
 
 #include "NbRuntime.h"
 #include "../Parser.h"
+#include "../StdLib.h"
 
 NbRuntime::NbRuntime(QObject *parent)
     : QThread(parent)
 {
+    StdLib().load(_eval);
 }
 
 void NbRuntime::queueCell(Cell *cell)
@@ -114,6 +116,11 @@ void NbRuntime::evalRemaining()
             emit cellQuit(cell);
         }
         catch (StackOverflowException &ex)
+        {
+            _running = nullptr;
+            emit cellFinishedRunning(cell, RuntimeResult(ex));
+        }
+        catch (AssertionException &ex)
         {
             _running = nullptr;
             emit cellFinishedRunning(cell, RuntimeResult(ex));

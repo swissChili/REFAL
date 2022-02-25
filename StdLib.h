@@ -11,5 +11,6 @@ public:
 
 private:
 	Function _print{"Print"},
-		_prout{"Prout"};
+        _prout{"Prout"},
+        _sleep{"Sleep"};
 };
