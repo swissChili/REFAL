@@ -42,3 +42,13 @@ void eout(QString string)
 {
     QTextStream(stderr) << string << '\n';
 }
+
+QString pprint(QList<Token> val)
+{
+    return pprintDense(val);
+}
+
+QString pprint(QList<AstNode> val)
+{
+    return pprintDense(val);
+}

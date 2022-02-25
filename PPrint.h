@@ -12,14 +12,11 @@
 template <typename T>
 QString pprint(T val);
 
-//template <>
-//QString pprint<Token>(Token val);
+QString pprint(QList<Token> val);
+QString pprint(QList<AstNode> val);
 
-//template <>
-//QString pprint<AstNode>(AstNode val);
-
-template <typename T, typename std::enable_if_t<std::is_base_of<TokenBase<T>, T>::value>::value = true>
-QString pprint(QList<T> val)
+template <typename T>
+QString pprintDense(QList<T> val)
 {
     QString out;
     int lastType = -1;
@@ -28,7 +25,7 @@ QString pprint(QList<T> val)
 
     for (const T &v : val)
     {
-        if ((lastType != v.type() || v.type() != T::SYMBOL) && lastType != -1)
+        if ((lastType != v.type() || v.type() != T::SYM) && lastType != -1)
             out += " ";
 
         out += QString(v);
