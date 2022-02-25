@@ -11,8 +11,8 @@ Rectangle {
     color: Material.color(Material.Grey, Material.theme == Material.Dark ? Material.Shade800 : Material.Shade300)
     height: 2
     Layout.fillWidth: true
-    Layout.topMargin: 14
-    Layout.bottomMargin: 14
+    Layout.topMargin: 16
+    Layout.bottomMargin: 16
 
     transitions: Transition {
         NumberAnimation {
@@ -22,6 +22,23 @@ Rectangle {
         }
     }
 
+    states: [
+        State {
+            when: mouseArea.containsMouse || addButton.hovered
+            PropertyChanges {
+                target: root
+                opacity: 1
+            }
+        },
+        State {
+            when: !mouseArea.containsMouse && !addButton.hovered
+            PropertyChanges {
+                target: root
+                opacity: 0
+            }
+        }
+    ]
+
     MouseArea {
         id: mouseArea
         height: 30
@@ -29,22 +46,7 @@ Rectangle {
         anchors.centerIn: parent
         hoverEnabled: true
 
-        states: [
-            State {
-                when: mouseArea.containsMouse
-                PropertyChanges {
-                    target: root
-                    opacity: 1
-                }
-            },
-            State {
-                when: !mouseArea.containsMouse
-                PropertyChanges {
-                    target: root
-                    opacity: 0
-                }
-            }
-        ]
+        propagateComposedEvents: true
     }
 
     Item {
@@ -61,6 +63,8 @@ Rectangle {
             flat: true
 
             onClicked: root.insertClicked()
+
+            hoverEnabled: true
         }
     }
 }

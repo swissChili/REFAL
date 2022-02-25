@@ -4,8 +4,7 @@
 
 #include "Cell.h"
 #include "NbRuntime.h"
-
-class CellModel;
+#include "CellModel.h"
 
 class Notebook : public QObject
 {

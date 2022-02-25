@@ -65,14 +65,26 @@ ApplicationWindow {
                     Pane {
                         Layout.bottomMargin: 0
 
-                        Label {
-                            font.pointSize: 18
-                            text: "Notebook"
+                        ColumnLayout {
+                            Label {
+                                font.pointSize: 18
+                                text: "Notebook"
+                            }
+
+                            Label {
+                                visible: codeEditor.count === 0
+
+                                text: "Looks like you haven't created any cells yet. Click the + button below to create one."
+                            }
                         }
                     }
 
                     InsertRow {
                         onInsertClicked: notebook.cellModel.insertCellBefore(0)
+                    }
+
+                    Item {
+                        height: 5 // JANK!
                     }
                 }
 
@@ -90,7 +102,7 @@ ApplicationWindow {
                     status: model.status
                     cellActive: codeEditor.currentIndex === index
 
-                    onCodeEditingFinished: model.code = code
+                    onCodeEditingFinished: code => model.code = code
 
                     onInsertBelowClicked: {
                         console.info(index);

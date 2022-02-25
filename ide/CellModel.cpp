@@ -1,4 +1,5 @@
 #include "CellModel.h"
+#include "Notebook.h"
 
 CellModel::CellModel(Notebook *parent)
     : QAbstractListModel(parent)

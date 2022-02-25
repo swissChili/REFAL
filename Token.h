@@ -55,7 +55,7 @@ protected:
 	int _intVal = 0;
     QString _stringVal = "";
     QList<T> _listVal;
-    QChar _charVal = 0;
+    QChar _charVal = QChar(0);
 };
 
 class Token : public TokenBase<Token>

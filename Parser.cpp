@@ -51,14 +51,19 @@ Parser::Parser(QString input)
 QChar Parser::peek()
 {
     if (atEnd())
-        return 0;
+        return QChar(0);
 
     return _input[_pos];
 }
 
 QChar Parser::get()
 {
-    QChar c = _input[_pos++];
+    QChar c;
+
+    if (_pos < _input.size())
+        c = _input[_pos++];
+    else
+        return QChar(0);
 
 	if (c == '\n')
 	{

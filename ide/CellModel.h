@@ -3,8 +3,9 @@
 #include <QAbstractListModel>
 #include <qqml.h>
 
-#include "Notebook.h"
 #include "Cell.h"
+
+class Notebook;
 
 class CellModel : public QAbstractListModel
 {

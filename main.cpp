@@ -267,6 +267,8 @@ void testAllEvals()
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+
     Application a(argc, argv);
     a.setApplicationName("REFAL");
     a.setApplicationVersion("1.0-a1");
