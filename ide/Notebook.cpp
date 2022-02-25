@@ -4,17 +4,26 @@
 
 // TODO: avoid potential race condition if Cell is deleted, pass by value with same UUID instead
 
+Notebook::~Notebook()
+{
+    _rtThread->quit();
+    _rtThread->wait();
+}
+
 Notebook::Notebook(QObject *parent)
     : QObject(parent)
     , _cellModel(new CellModel(this))
+    , _rt(new NbRuntime(this))
+    , _rtThread(new QThread(this))
 {
-    connect(&_rt, &NbRuntime::cellFailedToParse, this, &Notebook::cellFailedToParse);
-    connect(&_rt, &NbRuntime::cellFinishedRunning, this, &Notebook::cellFinishedRunning);
-    connect(&_rt, &NbRuntime::cellQuit, this, &Notebook::cellQuit);
-    connect(&_rt, &NbRuntime::cellRunning, this, &Notebook::cellRunning);
-    connect(&_rt, &NbRuntime::cellWaiting, this, &Notebook::cellWaiting);
+    connect(_rt, &NbRuntime::cellFailedToParse, this, &Notebook::cellFailedToParse);
+    connect(_rt, &NbRuntime::cellFinishedRunning, this, &Notebook::cellFinishedRunning);
+    connect(_rt, &NbRuntime::cellQuit, this, &Notebook::cellQuit);
+    connect(_rt, &NbRuntime::cellRunning, this, &Notebook::cellRunning);
+    connect(_rt, &NbRuntime::cellWaiting, this, &Notebook::cellWaiting);
 
-    _rt.start();
+    _rt->moveToThread(_rtThread);
+    _rtThread->start();
 }
 
 Notebook::Notebook(const Notebook &other, QObject *parent)
@@ -34,12 +43,12 @@ CellModel *Notebook::cellModel()
 void Notebook::runCell(QUuid uuid)
 {
     qInfo() << "Running cell" << uuid;
-    _rt.queueCell(Cell::cellFromUuid(uuid));
+    _rt->queueCell(Cell::cellFromUuid(uuid));
 }
 
 void Notebook::quitCell(QUuid uuid)
 {
-    _rt.unqueueCell(Cell::cellFromUuid(uuid));
+    _rt->unqueueCell(Cell::cellFromUuid(uuid));
 }
 
 void Notebook::cellFinishedRunning(Cell *cell, RuntimeResult result)

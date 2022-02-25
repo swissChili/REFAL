@@ -14,6 +14,7 @@ class Notebook : public QObject
     Q_PROPERTY(CellModel *cellModel READ cellModel NOTIFY cellModelChanged)
 
 public:
+    ~Notebook();
     explicit Notebook(QObject *parent = nullptr);
     Notebook(const Notebook &other, QObject *parent = nullptr);
 
@@ -37,7 +38,8 @@ protected:
 
     QList<Cell *> _cells;
     CellModel *_cellModel;
-    NbRuntime _rt;
+    NbRuntime *_rt;
+    QThread *_rtThread;
 };
 
 Q_DECLARE_METATYPE(Notebook)

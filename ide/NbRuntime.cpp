@@ -5,7 +5,7 @@
 #include "../StdLib.h"
 
 NbRuntime::NbRuntime(QObject *parent)
-    : QThread(parent)
+    : QObject(parent)
 {
     StdLib().load(_eval);
 }
@@ -65,7 +65,7 @@ void NbRuntime::evalRemaining()
             {
                 ParseResult ret;
                 Function func;
-                AstNode ast;
+                QList<AstNode> ast;
 
                 if ((ret = parser.parseFunctionDefinition(&func)))
                 {
@@ -76,14 +76,17 @@ void NbRuntime::evalRemaining()
                     emit cellFailedToParse(cell, ret);
                     goto endOfCell; // JANK!
                 }
-                else if ((ret = parser.parseOne(&ast)))
+                else if ((ret = parser.parseMany(&ast)) && !ast.empty())
                 {
-                    RuntimeResult nodeRes = _eval.evaluate(ast, _ctx);
-                    result += nodeRes;
-
-                    if (!nodeRes.success())
+                    for (const AstNode &node : ast)
                     {
-                        break;
+                        RuntimeResult nodeRes = _eval.evaluate(node, _ctx);
+                        result += nodeRes;
+
+                        if (!nodeRes.success())
+                        {
+                            goto endOfParseLoop;
+                        }
                     }
                 }
                 else if (ret.status() == ParseResult::INCOMPLETE)
@@ -105,6 +108,7 @@ void NbRuntime::evalRemaining()
                 }
             }
 
+        endOfParseLoop:
             emit cellFinishedRunning(cell, result);
 
         endOfCell:

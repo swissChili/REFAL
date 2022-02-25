@@ -13,9 +13,6 @@ int ideMain(QGuiApplication *app)
 
     QQmlApplicationEngine engine;
 
-    // This is done implicitly now.
-    // registerTypes(&engine);
-
     QQuickStyle::setStyle("Material");
 
     qRegisterMetaType<CellModel>();

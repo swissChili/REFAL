@@ -22,35 +22,35 @@ int g_numFailed = 0;
 
 void testEval(QString function, QString expression, QString expected)
 {
-	Evaluator eval;
-	Parser funcParser(function),
-		exprParser(expression),
-		resParser(expected);
+    Evaluator eval;
+    Parser funcParser(function),
+        exprParser(expression),
+        resParser(expected);
 
-	Function func;
+    Function func;
 
-	QList<AstNode> expr;
-	ParseResult exprRet = exprParser.parseMany<AstNode>(&expr);
-	QList<Token> res;
-	ParseResult resRet = resParser.parseMany<Token>(&res);
-	ParseResult funcRet;
+    QList<AstNode> expr;
+    ParseResult exprRet = exprParser.parseMany<AstNode>(&expr);
+    QList<Token> res;
+    ParseResult resRet = resParser.parseMany<Token>(&res);
+    ParseResult funcRet;
 
-	QList<Token> result;
+    QList<Token> result;
 
-	exprParser.skip();
-	resParser.skip();
-	while ((funcRet = funcParser.parseFunctionDefinition(&func)))
-	{
-		eval.addFunction(func);
-	}
+    exprParser.skip();
+    resParser.skip();
+    while ((funcRet = funcParser.parseFunctionDefinition(&func)))
+    {
+        eval.addFunction(func);
+    }
 
-	funcParser.skip();
+    funcParser.skip();
 
-	if (!exprRet || !resRet || funcRet.status() == ParseResult::INCOMPLETE)
-	{
+    if (!exprRet || !resRet || funcRet.status() == ParseResult::INCOMPLETE)
+    {
         g_numFailed++;
         qDebug() << "\n\033[31mTEST FAILS:\033[0m";
-		qDebug() << "Failed to fully parse expression, function or result";
+        qDebug() << "Failed to fully parse expression, function or result";
         qDebug() << "Function:";
         sout(pprint(funcRet, funcParser));
 
@@ -60,33 +60,33 @@ void testEval(QString function, QString expression, QString expected)
         qDebug() << "Result:";
         sout(pprint(resRet, resParser));
 
-		goto end;
-	}
+        goto end;
+    }
 
-	for (const AstNode &node : expr)
-	{
-		RuntimeResult rr = eval.evaluate(node, VarContext());
+    for (const AstNode &node : expr)
+    {
+        RuntimeResult rr = eval.evaluate(node, VarContext());
 
-		if (!rr.success())
-		{
-			g_numFailed++;
-			qDebug() << "\n\033[31mTEST FAILS:\033[0m";
-			qDebug() << "Runtime error while evaluating" << node;
-			qDebug() << rr;
+        if (!rr.success())
+        {
+            g_numFailed++;
+            qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+            qDebug() << "Runtime error while evaluating" << node;
+            qDebug() << rr;
 
-			goto end;
-		}
+            goto end;
+        }
 
-		result.append(rr.result());
-	}
+        result.append(rr.result());
+    }
 
-	if (result != res)
-	{
-		g_numFailed++;
-		qDebug() << "\n\033[31mTEST FAILS:\033[0m";
-		qDebug() << "Expected result" << res;
-		qDebug() << "Got" << result;
-	}
+    if (result != res)
+    {
+        g_numFailed++;
+        qDebug() << "\n\033[31mTEST FAILS:\033[0m";
+        qDebug() << "Expected result" << res;
+        qDebug() << "Got" << result;
+    }
 
 end:
     qDebug() << "\033[36mEvaluate\033[0m" << function << expression << "->" << pprint(result);
@@ -94,7 +94,7 @@ end:
 
 void testEval(QString function, QString expression, QList<Token> expected)
 {
-	testEval(function, expression, pprint(expected));
+    testEval(function, expression, pprint(expected));
 }
 
 void testEval(QString expression, QString expected)
@@ -124,13 +124,13 @@ void testMatch(QString data, QString pattern, bool shouldBe = true)
     Parser dataParser(data),
         patternParser(pattern);
 
-	QList<Token> parsedData, parsedPattern;
-	
-	dataParser.parseMany<Token>(&parsedData);
-	patternParser.parseMany<Token>(&parsedPattern);
+    QList<Token> parsedData, parsedPattern;
+    
+    dataParser.parseMany<Token>(&parsedData);
+    patternParser.parseMany<Token>(&parsedPattern);
 
     testMatch(pattern + " = " + data, shouldBe,
-			  match(parsedData, parsedPattern, VarContext()));
+              match(parsedData, parsedPattern, VarContext()));
 }
 
 void testParseAst(QString string, QList<AstNode> equals = {})
@@ -138,14 +138,14 @@ void testParseAst(QString string, QList<AstNode> equals = {})
     Parser parser{string};
 
     QList<AstNode> result;
-	parser.parseMany<AstNode>(&result);
+    parser.parseMany<AstNode>(&result);
 
-	if (!equals.empty() && result != equals)
-	{
+    if (!equals.empty() && result != equals)
+    {
         g_numFailed++;
         qDebug() << "\n\033[31mTEST FAILS:\033[0m";
         qDebug() << "Expected" << pprint(equals);
-	}
+    }
 
     qDebug() << "\033[36mParse\033[0m" << string << pprint(result);
 }
@@ -153,7 +153,7 @@ void testParseAst(QString string, QList<AstNode> equals = {})
 void testParseFunc(QString string)
 {
     Parser parser{string};
-	ParseResult ret;
+    ParseResult ret;
 
     Function func;
 
@@ -200,13 +200,13 @@ void testAllMatches()
         Token('e', "middle"),
         Token('s', "a")};
     testMatch("s.a e.middle s.a = aea", true,
-                match({Token('a'), Token('e'), Token('a')}, sameStartEnd, VarContext()));
+              match({Token('a'), Token('e'), Token('a')}, sameStartEnd, VarContext()));
 
     testMatch("s.a e.middle s.a = aef Hi a", true,
-                match({Token('a'), Token('e'), Token('f'), Token("Hi"), Token('a')}, sameStartEnd, VarContext()));
+              match({Token('a'), Token('e'), Token('f'), Token("Hi"), Token('a')}, sameStartEnd, VarContext()));
 
     testMatch("s.a e.middle s.a = aef Hi c", false,
-                match({Token('a'), Token('e'), Token('f'), Token("Hi"), Token('c')}, sameStartEnd, VarContext()));
+              match({Token('a'), Token('e'), Token('f'), Token("Hi"), Token('c')}, sameStartEnd, VarContext()));
 
     LTok parenthesized = {
         Token(LTok({Token('s', "a")})),
@@ -220,14 +220,14 @@ void testAllMatches()
         Token('y')};
 
     testMatch("(s.a) e.Middle s.a = (y)f MiddleStuff y", true,
-                match(parenTest1, parenthesized, VarContext()));
+              match(parenTest1, parenthesized, VarContext()));
     // testMatch("(y)f Middle-stuff y", "(s.a) e.Middle s.a");
 
     testMatch("(a)", "(a)");
-	testMatch("hello", "s.A e.Rest");
-	testMatch("123", "123");
-	testMatch("(123)", "t.a");
-	testMatch("(123)", "(s.a)");
+    testMatch("hello", "s.A e.Rest");
+    testMatch("123", "123");
+    testMatch("(123)", "t.a");
+    testMatch("(123)", "(s.a)");
 }
 
 void testAllParses()
@@ -244,8 +244,8 @@ void testAllParses()
     testParseAst("(s.a) e.Middle s.a");
     testParseAst("Hello; Goodbye");
     testParseAst("Key = Value");
-	testParseAst("123", {AstNode("123", 10)});
-	testParseAst("12 00", {AstNode::fromInteger(12), AstNode::fromInteger(0)});
+    testParseAst("123", {AstNode("123", 10)});
+    testParseAst("12 00", {AstNode::fromInteger(12), AstNode::fromInteger(0)});
     testParseAst("s.A s.B", {AstNode('s', "A"), AstNode('s', "B")});
     testParseAst("a '=' b", {AstNode('a'), AstNode('='), AstNode('b')});
     testParseAst("'This\\'<>#$@#^%\\n' 'another $3543543'");
@@ -259,8 +259,8 @@ void testAllFunctionDefs()
 
 void testAllEvals()
 {
-	testEval("First {s.A e.Rest = s.A;}", "<First hello>", "h");
-	testEval("Number { = 123; }", "<Number>", QList<Token>{Token::fromInteger(123)});
+    testEval("First {s.A e.Rest = s.A;}", "<First hello>", "h");
+    testEval("Number { = 123; }", "<Number>", QList<Token>{Token::fromInteger(123)});
     testEval("<Br Name '=' Jim> <Dg Name>", "Jim");
     testEval("<Br A '=' hello> <Br A '=' 'good bye'> <Dg A> <Dg A>", "'good byehello'");
 }
@@ -273,43 +273,43 @@ int main(int argc, char *argv[])
     a.setApplicationName("REFAL");
     a.setApplicationVersion("1.0-a1");
 
-	QCommandLineParser cli;
-	cli.setApplicationDescription("REFAL interpreter");
-	cli.addHelpOption();
-	cli.addVersionOption();
+    QCommandLineParser cli;
+    cli.setApplicationDescription("REFAL interpreter");
+    cli.addHelpOption();
+    cli.addVersionOption();
 
     cli.addPositionalArgument("script", "REFAL script to run");
 
-	QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite.");
-	cli.addOption(testOption);
+    QCommandLineOption testOption(QStringList{"t", "test"}, "Run test suite.");
+    cli.addOption(testOption);
     QCommandLineOption replOption(QStringList({"r", "repl"}), "Start CLI REPL");
     cli.addOption(replOption);
 
-	cli.process(a);
+    cli.process(a);
 
     if (cli.positionalArguments().length() > 0)
     {
         qDebug() << "Running script" << cli.positionalArguments()[0];
     }
     else if (cli.isSet(testOption))
-	{
-		testAllMatches();
-		qDebug() << "";
-		testAllParses();
-		qDebug() << "";
-		testAllFunctionDefs();
-		qDebug() << "";
-		testAllEvals();
+    {
+        testAllMatches();
+        qDebug() << "";
+        testAllParses();
+        qDebug() << "";
+        testAllFunctionDefs();
+        qDebug() << "";
+        testAllEvals();
 
-		qDebug() << "";
+        qDebug() << "";
 
-		return testResults();
-	}
+        return testResults();
+    }
     else if (cli.isSet(replOption))
-	{
-		Repl repl;
-		repl.start();
-	}
+    {
+        Repl repl;
+        repl.start();
+    }
     else
     {
         return ideMain(&a);

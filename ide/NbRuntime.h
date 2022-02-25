@@ -9,7 +9,7 @@
 #include "../Evaluator.h"
 #include "../Parser.h"
 
-class NbRuntime : public QThread
+class NbRuntime : public QObject
 {
     Q_OBJECT
 

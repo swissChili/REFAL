@@ -22,7 +22,10 @@ Item {
 
     height: column.height
 
-    Keys.onEscapePressed: root.cellUnfocused()
+    Keys.onEscapePressed: {
+		root.cellUnfocused()
+		code.focus = false
+	}
 
     ColumnLayout {
         id: column
@@ -76,9 +79,11 @@ Item {
                     Layout.fillHeight: true
 
                     TextArea {
+                        id: code
+
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        id: code
+
                         font.family: "monospace"
                         text: root.code
                         selectByMouse: true
@@ -115,6 +120,8 @@ Item {
                 }
 
                 RoundButton {
+					Layout.alignment: Qt.AlignTop
+
                     icon.source: "qrc:///icons/menu.svg"
                     icon.color: Constants.buttonGrey
                     flat: true
