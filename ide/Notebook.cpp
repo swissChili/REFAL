@@ -8,13 +8,15 @@ Notebook::~Notebook()
 {
     _rtThread->quit();
     _rtThread->wait();
+
+    delete _rt;
 }
 
 Notebook::Notebook(QObject *parent)
     : QObject(parent)
     , _cellModel(new CellModel(this))
-    , _rt(new NbRuntime(this))
     , _rtThread(new QThread(this))
+    , _rt(new NbRuntime)
 {
     connect(_rt, &NbRuntime::cellFailedToParse, this, &Notebook::cellFailedToParse);
     connect(_rt, &NbRuntime::cellFinishedRunning, this, &Notebook::cellFinishedRunning);
@@ -56,13 +58,15 @@ void Notebook::cellFinishedRunning(Cell *cell, RuntimeResult result)
     qInfo() << "cellFinishedRunning" << cell->uuid() << pprint(result);
     cell->setResult(pprint(result));
     cell->setStatus(Cell::IDLE);
+    cell->setResultType(Cell::EXPRESSION);
 }
 
-void Notebook::cellFailedToParse(Cell *cell, ParseResult result)
+void Notebook::cellFailedToParse(Cell *cell, ParseResult result, Parser parser)
 {
-    qInfo() << "cellFailedToParse" << cell->uuid() << pprint(result);
-    cell->setResult(pprint(result));
+    qInfo() << "cellFailedToParse" << cell->uuid() << pprint(result, parser);
+    cell->setResult(pprint(result, parser, PPrint::HTML));
     cell->setStatus(Cell::IDLE);
+    cell->setResultType(Cell::DIAGNOSTIC);
 }
 
 void Notebook::cellWaiting(Cell *cell)

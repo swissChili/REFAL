@@ -14,6 +14,7 @@ class Cell : public QObject
     Q_PROPERTY(QString result READ result WRITE setResult NOTIFY resultChanged)
     Q_PROPERTY(QUuid uuid READ uuid NOTIFY uuidChanged)
     Q_PROPERTY(int status READ status WRITE setStatus NOTIFY statusChanged)
+    Q_PROPERTY(int resultType READ resultType WRITE setResultType NOTIFY resultTypeChanged)
 
 public:
     ~Cell();
@@ -27,10 +28,12 @@ public:
     QString result() const;
     QUuid uuid() const;
     int status() const;
+    int resultType() const;
 
     void setCode(QString code);
     void setResult(QString result);
     void setStatus(int status);
+    void setResultType(int resultType);
 
     Q_INVOKABLE static Cell *cellFromUuid(QUuid uuid);
 
@@ -43,14 +46,23 @@ public:
 
     Q_ENUM(Status);
 
+    enum ResultType
+    {
+        EXPRESSION,
+        DIAGNOSTIC
+    };
+
+    Q_ENUM(ResultType)
+
 signals:
     void codeChanged(QString code);
     void resultChanged(QString result);
     void uuidChanged(QUuid uuid);
     void statusChanged(int status);
+    void resultTypeChanged(int resultType);
 
 private:
-    int _status = IDLE;
+    int _status = IDLE, _resultType = EXPRESSION;
     QString _code, _result;
     QUuid _uuid = QUuid::createUuid();
 

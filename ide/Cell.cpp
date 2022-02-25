@@ -53,6 +53,11 @@ int Cell::status() const
     return _status;
 }
 
+int Cell::resultType() const
+{
+    return _resultType;
+}
+
 void Cell::setCode(QString code)
 {
     _code = code;
@@ -69,6 +74,12 @@ void Cell::setStatus(int status)
 {
     _status = status;
     emit statusChanged(status);
+}
+
+void Cell::setResultType(int resultType)
+{
+    _resultType = resultType;
+    emit resultTypeChanged(resultType);
 }
 
 Cell *Cell::cellFromUuid(QUuid uuid)

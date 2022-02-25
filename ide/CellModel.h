@@ -21,6 +21,7 @@ public:
         ResultRole,
         UuidRole,
         StatusRole,
+        ResultTypeRole,
     };
 
     // Basic functionality:

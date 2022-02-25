@@ -54,7 +54,17 @@ QString pprint(T val)
 	return static_cast<QString>(val);
 }
 
-QString pprint(ParseResult val, const Parser &parser);
+class PPrint
+{
+public:
+    enum Style
+    {
+        ANSI,
+        HTML
+    };
+};
+
+QString pprint(ParseResult val, const Parser &parser, PPrint::Style style = PPrint::ANSI);
 
 void sout(QString string);
 void eout(QString string);

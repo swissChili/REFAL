@@ -28,7 +28,7 @@ signals:
 
 protected slots:
     void cellFinishedRunning(Cell *cell, RuntimeResult result);
-    void cellFailedToParse(Cell *cell, ParseResult result);
+    void cellFailedToParse(Cell *cell, ParseResult result, Parser parser);
     void cellWaiting(Cell *cell);
     void cellRunning(Cell *cell);
     void cellQuit(Cell *cell);
@@ -38,8 +38,8 @@ protected:
 
     QList<Cell *> _cells;
     CellModel *_cellModel;
-    NbRuntime *_rt;
     QThread *_rtThread;
+    NbRuntime *_rt;
 };
 
 Q_DECLARE_METATYPE(Notebook)

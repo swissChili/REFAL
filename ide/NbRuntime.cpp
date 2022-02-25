@@ -73,7 +73,7 @@ void NbRuntime::evalRemaining()
                 }
                 else if (ret.status() == ParseResult::INCOMPLETE)
                 {
-                    emit cellFailedToParse(cell, ret);
+                    emit cellFailedToParse(cell, ret, parser);
                     goto endOfCell; // JANK!
                 }
                 else if ((ret = parser.parseMany(&ast)) && !ast.empty())
@@ -91,7 +91,7 @@ void NbRuntime::evalRemaining()
                 }
                 else if (ret.status() == ParseResult::INCOMPLETE)
                 {
-                    emit cellFailedToParse(cell, ret);
+                    emit cellFailedToParse(cell, ret, parser);
                     break;
                 }
                 else
@@ -100,7 +100,7 @@ void NbRuntime::evalRemaining()
 
                     if (!parser.atEnd())
                     {
-                        emit cellFailedToParse(cell, ParseResult(ParseResult::NO_MATCH, "Garbage at end of input", parser.save()));
+                        emit cellFailedToParse(cell, ParseResult(ParseResult::NO_MATCH, "Garbage at end of input", parser.save()), parser);
                         goto endOfCell;
                     }
 

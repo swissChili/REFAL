@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.0
 import QtQuick.Layouts 1.0
@@ -11,6 +11,7 @@ Item {
     required property string code
     required property string result
     property int status: Cell.IDLE
+    property int resultType: Cell.EXPRESSION
     property bool cellActive: false
 
     signal insertBelowClicked()
@@ -97,13 +98,11 @@ Item {
                             cursorPosition = pos
                         }
 
-//                        Keys.onEscapePressed: {
-//                            focus = false
-//                        }
-
-                        onEditingFinished: {
+                        onTextChanged: {
                             root.codeEditingFinished(text)
                         }
+
+                        onPressed: root.cellFocused()
 
                         onFocusChanged: if (focus) root.cellFocused()
                         onActiveFocusChanged: if (activeFocus) root.cellFocused()
@@ -114,6 +113,7 @@ Item {
                         Layout.fillWidth: true
                         font.family: "monospace"
                         text: root.result
+                        textFormat: root.resultType === Cell.EXPRESSION ? Text.PlainText : Text.RichText
 
                         Layout.bottomMargin: 5
                     }

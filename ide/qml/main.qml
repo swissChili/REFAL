@@ -15,6 +15,27 @@ ApplicationWindow {
     Material.theme: Material.Light
     Material.accent: Material.Orange
 
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr("&File")
+        }
+
+        Menu {
+            title: qsTr("&Runtime")
+
+            Action {
+                text: qsTr("Run &Selected Cell")
+                shortcut: "Ctrl+Return"
+
+                onTriggered: {
+                    if (codeEditor.currentItem !== null) {
+                        notebook.runCell(codeEditor.currentItem.uuid)
+                    }
+                }
+            }
+        }
+    }
+
     Notebook {
         id: notebook
     }
@@ -100,6 +121,7 @@ ApplicationWindow {
                     code: model.code
                     result: model.result.trim()
                     status: model.status
+                    resultType: model.resultType
                     cellActive: codeEditor.currentIndex === index
 
                     onCodeEditingFinished: code => model.code = code

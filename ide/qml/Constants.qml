@@ -1,6 +1,6 @@
 pragma Singleton
 
-import QtQuick 2.0
+import QtQuick 2.5
 import QtQuick.Controls.Material 2.0
 
 QtObject {

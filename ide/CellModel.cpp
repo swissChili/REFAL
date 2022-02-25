@@ -37,6 +37,8 @@ QVariant CellModel::data(const QModelIndex &index, int role) const
         return _notebook->_cells[index.row()]->uuid();
     case StatusRole:
         return _notebook->_cells[index.row()]->status();
+    case ResultTypeRole:
+        return _notebook->_cells[index.row()]->resultType();
     default:
         return QVariant();
     }
@@ -56,6 +58,9 @@ bool CellModel::setData(const QModelIndex &index, const QVariant &value, int rol
             break;
         case StatusRole:
             _notebook->_cells[index.row()]->setStatus(value.toInt());
+            break;
+        case ResultTypeRole:
+            _notebook->_cells[index.row()]->setResultType(value.toInt());
             break;
         default:
             return false;
@@ -100,6 +105,11 @@ bool CellModel::insertRows(int row, int count, const QModelIndex &parent)
             announceCellChange(cell, StatusRole);
         });
 
+        connect(cell, &Cell::resultTypeChanged, this, [this, cell](int)
+        {
+            announceCellChange(cell, ResultTypeRole);
+        });
+
         _notebook->_cells.insert(row, cell);
     }
 
@@ -130,6 +140,7 @@ QHash<int, QByteArray> CellModel::roleNames() const
         {ResultRole, "result"},
         {UuidRole, "uuid"},
         {StatusRole, "status"},
+        {ResultTypeRole, "resultType"},
     };
 }
 

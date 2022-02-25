@@ -22,7 +22,7 @@ public slots:
 
 signals:
     void cellFinishedRunning(Cell *cell, RuntimeResult result);
-    void cellFailedToParse(Cell *cell, ParseResult result);
+    void cellFailedToParse(Cell *cell, ParseResult result, Parser parser);
     void cellWaiting(Cell *cell);
     void cellRunning(Cell *cell);
     void cellQuit(Cell *cell);

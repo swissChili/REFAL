@@ -10,6 +10,5 @@
         <file>icons/menu.svg</file>
         <file>qml/Constants.qml</file>
         <file>qml/qmldir</file>
-        <file>qml/qtquickcontrols2.conf</file>
     </qresource>
 </RCC>
