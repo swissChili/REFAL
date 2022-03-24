@@ -4,6 +4,7 @@
 #include <qqml.h>
 #include <QUuid>
 #include <QHash>
+#include <QJsonObject>
 
 class Cell : public QObject
 {
@@ -36,6 +37,8 @@ public:
     void setResultType(int resultType);
 
     Q_INVOKABLE static Cell *cellFromUuid(QUuid uuid);
+
+    Q_INVOKABLE QJsonObject toJson() const;
 
     enum Status
     {

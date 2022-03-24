@@ -5,7 +5,7 @@
 
 #include "CellModel.h"
 
-int ideMain(QGuiApplication *app)
+int ideMain(Application *app)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

@@ -1,4 +1,4 @@
-QT += quick quickcontrols2
+QT += quick widgets quickcontrols2
 QT -= core
 
 CONFIG += qmltypes

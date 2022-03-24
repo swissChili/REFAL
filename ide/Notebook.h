@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QJsonDocument>
+#include <QFile>
 
 #include "Cell.h"
 #include "NbRuntime.h"
@@ -12,6 +14,7 @@ class Notebook : public QObject
     QML_ELEMENT
 
     Q_PROPERTY(CellModel *cellModel READ cellModel NOTIFY cellModelChanged)
+    Q_PROPERTY(QString savePath READ savePath WRITE setSavePath NOTIFY savePathChanged)
 
 public:
     ~Notebook();
@@ -23,8 +26,18 @@ public:
     Q_INVOKABLE void runCell(QUuid uuid);
     Q_INVOKABLE void quitCell(QUuid uuid);
 
+    Q_INVOKABLE QJsonDocument toJson() const;
+    Q_INVOKABLE void save();
+
+    Q_INVOKABLE bool savePathSet();
+
+    QString savePath();
+    void setSavePath(QString savePath);
+
 signals:
     void cellModelChanged();
+    void saveError(QString message);
+    void savePathChanged(QString savePath);
 
 protected slots:
     void cellFinishedRunning(Cell *cell, RuntimeResult result);
@@ -40,6 +53,7 @@ protected:
     CellModel *_cellModel;
     QThread *_rtThread;
     NbRuntime *_rt;
+    QString _savePath = "";
 };
 
 Q_DECLARE_METATYPE(Notebook)

@@ -2,6 +2,10 @@
 #include "CellModel.h"
 #include "../PPrint.h"
 
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFileDialog>
+
 // TODO: avoid potential race condition if Cell is deleted, pass by value with same UUID instead
 
 Notebook::~Notebook()
@@ -51,6 +55,58 @@ void Notebook::runCell(QUuid uuid)
 void Notebook::quitCell(QUuid uuid)
 {
     _rt->unqueueCell(Cell::cellFromUuid(uuid));
+}
+
+QJsonDocument Notebook::toJson() const
+{
+    QJsonObject nb;
+    QJsonArray cellArray;
+
+    for (const Cell *cell : _cells)
+    {
+        cellArray.append(cell->toJson());
+    }
+
+    nb["cells"] = cellArray;
+
+    return QJsonDocument(nb);
+}
+
+void Notebook::save()
+{
+    if (_savePath == "")
+    {
+        setSavePath(QFileDialog::getSaveFileName(nullptr, "Open Refal Notebook", "", "Refal Notebooks (*.refnb)"));
+    }
+
+    QJsonDocument doc = toJson();
+    QFile save(_savePath);
+    save.open(QFile::WriteOnly);
+
+    if (!save.isOpen())
+    {
+        emit saveError(save.errorString());
+        return;
+    }
+
+    save.write(doc.toJson(QJsonDocument::Indented));
+    save.close();
+}
+
+bool Notebook::savePathSet()
+{
+    return _savePath != "";
+}
+
+QString Notebook::savePath()
+{
+    return _savePath;
+}
+
+void Notebook::setSavePath(QString savePath)
+{
+    _savePath = savePath;
+    emit savePathChanged(savePath);
 }
 
 void Notebook::cellFinishedRunning(Cell *cell, RuntimeResult result)

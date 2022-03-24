@@ -89,3 +89,15 @@ Cell *Cell::cellFromUuid(QUuid uuid)
     else
         return nullptr;
 }
+
+QJsonObject Cell::toJson() const
+{
+    QJsonObject object;
+
+    object["code"] = code();
+    object["result"] = result();
+    object["status"] = status();
+    object["resultType"] = resultType();
+
+    return object;
+}

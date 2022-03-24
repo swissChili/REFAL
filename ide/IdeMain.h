@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QGuiApplication>
+#include <QApplication>
 
-using Application = QGuiApplication;
+using Application = QApplication;
 
-int ideMain(QGuiApplication *app);
+int ideMain(QApplication *app);

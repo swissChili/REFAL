@@ -9,7 +9,7 @@ ApplicationWindow {
     id: root
     width: 1080
     height: 720
-    title: "Notebook"
+    title: "Refal Notebook -- " + notebook.savePath
     visible: true
 
     Material.theme: Material.Light
@@ -18,6 +18,15 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
+
+            Action {
+                text: "&Save"
+                shortcut: "Ctrl+s"
+
+                onTriggered: {
+                    notebook.save()
+                }
+            }
         }
 
         Menu {
@@ -38,6 +47,11 @@ ApplicationWindow {
 
     Notebook {
         id: notebook
+
+        onSaveError: (message) =>
+        {
+            console.error(message)
+        }
     }
 
     ColumnLayout {
