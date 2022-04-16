@@ -2,21 +2,22 @@
 
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QTranslator>
 
 #include "CellModel.h"
 
 int ideMain(Application *app)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
-
     QQmlApplicationEngine engine;
 
     QQuickStyle::setStyle("Material");
 
     qRegisterMetaType<CellModel>();
     qRegisterMetaType<CellModel *>();
+
+    QTranslator translator;
+    qInfo() << "loading translations" << translator.load(QLocale(), "refal", "_", ":/ts/", ".qm");
+    app->installTranslator(&translator);
 
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

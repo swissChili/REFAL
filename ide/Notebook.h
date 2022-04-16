@@ -26,6 +26,9 @@ public:
     Q_INVOKABLE void runCell(QUuid uuid);
     Q_INVOKABLE void quitCell(QUuid uuid);
 
+    Q_INVOKABLE void fromJson(QJsonDocument doc);
+    Q_INVOKABLE void open(QString path);
+
     Q_INVOKABLE QJsonDocument toJson() const;
     Q_INVOKABLE void save();
 

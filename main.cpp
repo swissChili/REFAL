@@ -268,6 +268,9 @@ void testAllEvals()
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
 
     Application a(argc, argv);
     a.setApplicationName("REFAL");

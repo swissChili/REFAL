@@ -38,6 +38,7 @@ public:
 
     Q_INVOKABLE static Cell *cellFromUuid(QUuid uuid);
 
+    Q_INVOKABLE void fromJson(QJsonObject json);
     Q_INVOKABLE QJsonObject toJson() const;
 
     enum Status

@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFileDialog>
+#include <QDebug>
 
 // TODO: avoid potential race condition if Cell is deleted, pass by value with same UUID instead
 
@@ -55,6 +56,47 @@ void Notebook::runCell(QUuid uuid)
 void Notebook::quitCell(QUuid uuid)
 {
     _rt->unqueueCell(Cell::cellFromUuid(uuid));
+}
+
+void Notebook::fromJson(QJsonDocument doc)
+{
+    QJsonObject nb = doc.object();
+    QJsonArray cellArray = nb["cells"].toArray();
+
+    for (const QJsonValueRef &cell : cellArray)
+    {
+        cellModel()->insertCellBefore(cellModel()->rowCount());
+        _cells.last()->fromJson(cell.toObject());
+    }
+}
+
+void Notebook::open(QString path)
+{
+    QFile file(path);
+
+    if (file.exists())
+    {
+        file.open(QFile::ReadOnly);
+
+        QJsonParseError error;
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
+
+        if (error.error == QJsonParseError::NoError)
+        {
+            fromJson(doc);
+        }
+        else
+        {
+            qWarning() << error.errorString();
+        }
+
+        file.close();
+        setSavePath(path);
+    }
+    else
+    {
+        qWarning() << "File does not exist" << path;
+    }
 }
 
 QJsonDocument Notebook::toJson() const

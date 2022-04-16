@@ -1,178 +1,186 @@
-import QtQuick 2.5
+import QtQuick 2.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.0
-import QtQuick.Layouts 1.3
-
-import sh.swisschili.REFAL 1.0
+import QtQuick.Layouts 1.11
 
 ApplicationWindow {
     id: root
-    width: 1080
-    height: 720
-    title: "Refal Notebook -- " + notebook.savePath
-    visible: true
+
+    title: "REFAL Studio"
+
+    width: 680
+    height: 360
+
+    minimumWidth: 680
+    minimumHeight: 360
 
     Material.theme: Material.Light
     Material.accent: Material.Orange
 
-    menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
+    visible: true
 
-            Action {
-                text: "&Save"
-                shortcut: "Ctrl+s"
+    function openNotebook(path=null) {
+        let NbWindow = Qt.createComponent("qrc:///qml/NbWindow.qml");
+        let window = NbWindow.createObject(null, {welcomeWindow: root});
 
-                onTriggered: {
-                    notebook.save()
-                }
-            }
-        }
-
-        Menu {
-            title: qsTr("&Runtime")
-
-            Action {
-                text: qsTr("Run &Selected Cell")
-                shortcut: "Ctrl+Return"
-
-                onTriggered: {
-                    if (codeEditor.currentItem !== null) {
-                        notebook.runCell(codeEditor.currentItem.uuid)
-                    }
-                }
-            }
-        }
-    }
-
-    Notebook {
-        id: notebook
-
-        onSaveError: (message) =>
+        if (path !== null)
         {
-            console.error(message)
+            window.openNotebook(path)
         }
     }
 
-    ColumnLayout {
-        id: column
-        anchors.fill: parent
+    function toggleVisible() {
+        if (visible)
+            hide();
+        else
+            show();
+    }
 
-        TabBar {
-            id: bar
+    Label {
+        id: textRefal
+        text: qsTr("REFAL")
+        anchors.left: parent.left
+        anchors.top: parent.top
+        font.pixelSize: 36
+        anchors.leftMargin: 36
+        anchors.topMargin: 29
+        font.weight: Font.Black
+        font.bold: true
+        font.italic: false
+    }
 
-            Layout.fillWidth: true
+    Label {
+        id: textStudio
+        y: 29
+        text: qsTr("Studio")
+        anchors.verticalCenter: textRefal.verticalCenter
+        anchors.left: textRefal.right
+        font.pixelSize: 36
+        anchors.leftMargin: 6
+        font.bold: false
+        font.italic: false
+        font.weight: Font.Medium
+        color: Material.color(Material.Orange)
+    }
 
-            TabButton {
-                text: "Notebook"
-                width: implicitWidth
+    Rectangle {
+        id: sepRect
+        x: 364
+        width: 1
+        color: "#cecece"
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 14
+        anchors.topMargin: 78
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Flickable {
+        id: notebooksFlick
+        anchors.left: textRefal.left
+        anchors.right: sepRect.left
+        anchors.top: textRefal.bottom
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: -8
+        anchors.rightMargin: 16
+        anchors.bottomMargin: 16
+        anchors.topMargin: 6
+        clip: true
+        flickableDirection: Flickable.VerticalFlick
+
+        ColumnLayout {
+            id: notebooksCol
+            spacing: 12
+
+            RowLayout {
+                id: nbBtnsRow
+                spacing: 12
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.leftMargin: 8
+                Layout.rightMargin: 8
+
+                Button {
+                    id: newNotebookBtn
+                    text: qsTr("New Notebook")
+                    font.bold: true
+                    highlighted: true
+
+                    onClicked: {
+                        root.openNotebook();
+                    }
+                }
+
+                Button {
+                    id: openNotebookBtn
+                    text: qsTr("Open Existing")
+                }
             }
 
-            TabButton {
-                text: "Another Notebook"
-                width: implicitWidth
+            Repeater {
+                id: notebooksList
+
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+
+                model: [
+                    // "~/Documents/Hello.refnb", "~/Downloads/stuff/Goodbye.refnb", "/home/ch/dev/REFAL/build/test.refnb"
+                ]
+
+                delegate: RecentNotebook {
+                    Layout.leftMargin: 8
+                    Layout.rightMargin: 8
+
+                    name: modelData.split("/").pop()
+
+                    ToolTip.text: modelData
+                    ToolTip.visible: containsMouse
+                    ToolTip.delay: 1000
+
+                    onClicked: root.openNotebook(modelData)
+                }
             }
 
-            TabButton {
-                text: "Testing"
-                width: implicitWidth
+            Label {
+                Layout.leftMargin: 8
+                Layout.rightMargin: 8
+
+                visible: notebooksList.count == 0
+                text: qsTr("Your recent notebooks will appear here")
             }
         }
+    }
 
-        SplitView {
-            id: split
-            Layout.fillHeight: true
+    ListView {
+        id: tipsList
+        anchors.left: sepRect.right
+        anchors.right: parent.right
+        anchors.top: textRefal.bottom
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 16
+        anchors.topMargin: 6
+        anchors.leftMargin: 16
+        anchors.rightMargin: 36
+        spacing: 12
+
+        model: [
+            {url: "https://wiki.swisschili.sh/wiki/REFAL", title: "REFAL Studio Wiki"},
+            {url: "https://wiki.swisschili.sh/wiki/REFAL/Cookbook", title: "REFAL Cookbook"},
+            {url: "http://refal.botik.ru/book/html/", title: "REFAL-5 Programming Guide (en)"},
+            {url: "http://refal.net/rf5_frm.htm", title: "REFAL-5 Programming Guide (ru)"}
+        ]
+
+        delegate: Tip {
             Layout.fillWidth: true
-            orientation: Qt.Horizontal
 
-            ListView {
-                id: codeEditor
-                SplitView.fillWidth: true
-                SplitView.minimumWidth: 400
-                model: notebook.cellModel
-                clip: true
+            url: modelData.url
+            title: modelData.title
 
-                spacing: 5
-
-                header: ColumnLayout {
-                    width: codeEditor.width
-
-                    Pane {
-                        Layout.bottomMargin: 0
-
-                        ColumnLayout {
-                            Label {
-                                font.pointSize: 18
-                                text: "Notebook"
-                            }
-
-                            Label {
-                                visible: codeEditor.count === 0
-
-                                text: "Looks like you haven't created any cells yet. Click the + button below to create one."
-                            }
-                        }
-                    }
-
-                    InsertRow {
-                        onInsertClicked: notebook.cellModel.insertCellBefore(0)
-                    }
-
-                    Item {
-                        height: 5 // JANK!
-                    }
-                }
-
-                delegate: NotebookCell {
-                    id: notebookCell
-
-                    required property var model
-                    required property var index
-                    required property var uuid
-
-                    width: codeEditor.width
-
-                    code: model.code
-                    result: model.result.trim()
-                    status: model.status
-                    resultType: model.resultType
-                    cellActive: codeEditor.currentIndex === index
-
-                    onCodeEditingFinished: code => model.code = code
-
-                    onInsertBelowClicked: {
-                        console.info(index);
-                        notebook.cellModel.insertCellBefore(index + 1);
-                    }
-
-                    onRunClicked: {
-                        console.info("Cell run clicked")
-                        notebook.runCell(uuid)
-                    }
-
-                    onCellFocused: {
-                        codeEditor.currentIndex = index
-                    }
-
-                    onDeleteClicked: {
-                        notebook.cellModel.deleteCellAt(index)
-                    }
-
-                    onCellUnfocused: {
-                        codeEditor.currentIndex = -1
-                    }
-                }
-            }
-
-            Item {
-                id: variables
-                SplitView.minimumWidth: 240
-
-                Label {
-                    anchors.centerIn: parent
-                    text: "Vars"
-                }
-            }
+            ToolTip.text: modelData.url
+            ToolTip.visible: containsMouse
+            ToolTip.delay: 1000
         }
     }
 }

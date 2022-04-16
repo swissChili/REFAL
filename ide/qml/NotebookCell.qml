@@ -90,7 +90,7 @@ Item {
                         selectByMouse: true
                         wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
 
-                        placeholderText: "Write some code..."
+                        placeholderText: qsTr("Write some code...")
 
                         Keys.onTabPressed: {
                             var pos = cursorPosition + 4
@@ -134,7 +134,7 @@ Item {
                         MenuItem {
                             icon.source: "qrc:///icons/trash.svg"
                             icon.color: Material.color(Material.Red)
-                            text: "Delete"
+                            text: qsTr("Delete")
 
                             onClicked: root.deleteClicked()
                         }

@@ -90,6 +90,14 @@ Cell *Cell::cellFromUuid(QUuid uuid)
         return nullptr;
 }
 
+void Cell::fromJson(QJsonObject json)
+{
+    setCode(json["code"].toString());
+    setResult(json["result"].toString());
+    setStatus(json["status"].toInt());
+    setResultType(json["resultType"].toInt());
+}
+
 QJsonObject Cell::toJson() const
 {
     QJsonObject object;

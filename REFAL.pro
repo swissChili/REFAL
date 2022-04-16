@@ -39,3 +39,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 LIBS += -lreadline
+
+TRANSLATIONS += $$files(ts/*.ts)
+RESOURCES += translations.qrc

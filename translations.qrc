@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ts/refal_en_US.qm</file>
+        <file>ts/refal_en_US.ts</file>
+        <file>ts/refal_ru_RU.qm</file>
+        <file>ts/refal_ru_RU.ts</file>
+    </qresource>
+</RCC>
