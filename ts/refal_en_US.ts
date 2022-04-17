@@ -21,27 +21,27 @@
         <translation>&amp;New</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="35"/>
+        <location filename="../ide/qml/NbWindow.qml" line="39"/>
         <source>&amp;Save</source>
         <translation>&amp;Save</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="44"/>
+        <location filename="../ide/qml/NbWindow.qml" line="48"/>
         <source>&amp;Open</source>
         <translation>&amp;Open</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="54"/>
+        <location filename="../ide/qml/NbWindow.qml" line="58"/>
         <source>&amp;View</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="57"/>
+        <location filename="../ide/qml/NbWindow.qml" line="61"/>
         <source>&amp;Welcome Window</source>
         <translation>&amp;Welcome Window</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="69"/>
+        <location filename="../ide/qml/NbWindow.qml" line="73"/>
         <source>&amp;Variable Inspector</source>
         <translation>&amp;Variable Inspector</translation>
     </message>
@@ -61,22 +61,22 @@
         <translation>Run &amp;All</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="98"/>
+        <location filename="../ide/qml/NbWindow.qml" line="100"/>
         <source>&amp;Reset Runtime State</source>
         <translation>&amp;Reset Runtime State</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="140"/>
+        <location filename="../ide/qml/NbWindow.qml" line="146"/>
         <source>Notebook</source>
         <translation>Notebook</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="146"/>
+        <location filename="../ide/qml/NbWindow.qml" line="152"/>
         <source>Looks like you haven&apos;t created any cells yet. Click the + button below to create one.</source>
         <translation>Looks like you haven&apos;t created any cells yet. Click the + button below to create one.</translation>
     </message>
     <message>
-        <location filename="../ide/qml/NbWindow.qml" line="208"/>
+        <location filename="../ide/qml/NbWindow.qml" line="214"/>
         <source>Variables</source>
         <translation>Variables</translation>
     </message>
@@ -95,29 +95,37 @@
     </message>
 </context>
 <context>
+    <name>RecentNotebook</name>
+    <message>
+        <location filename="../ide/qml/RecentNotebook.qml" line="45"/>
+        <source>Remove</source>
+        <translation>Remove</translation>
+    </message>
+</context>
+<context>
     <name>main</name>
     <message>
-        <location filename="../ide/qml/main.qml" line="41"/>
+        <location filename="../ide/qml/main.qml" line="50"/>
         <source>REFAL</source>
         <translation>REFAL</translation>
     </message>
     <message>
-        <location filename="../ide/qml/main.qml" line="55"/>
+        <location filename="../ide/qml/main.qml" line="64"/>
         <source>Studio</source>
         <translation>Studio</translation>
     </message>
     <message>
-        <location filename="../ide/qml/main.qml" line="106"/>
+        <location filename="../ide/qml/main.qml" line="115"/>
         <source>New Notebook</source>
         <translation>New Notebook</translation>
     </message>
     <message>
-        <location filename="../ide/qml/main.qml" line="117"/>
+        <location filename="../ide/qml/main.qml" line="126"/>
         <source>Open Existing</source>
         <translation>Open Existing</translation>
     </message>
     <message>
-        <location filename="../ide/qml/main.qml" line="151"/>
+        <location filename="../ide/qml/main.qml" line="159"/>
         <source>Your recent notebooks will appear here</source>
         <translation>Your recent notebooks will appear here</translation>
     </message>

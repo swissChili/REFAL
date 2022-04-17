@@ -88,6 +88,8 @@ public:
     // Throws an EvalQuitException
     void quit();
 
+    void reset();
+
 private:
 	QMap<QString, Function> _functions;
     QMap<QString, QStack<QList<Token>>> _vars;

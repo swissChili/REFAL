@@ -25,6 +25,8 @@ public:
 
     Q_INVOKABLE void runCell(QUuid uuid);
     Q_INVOKABLE void quitCell(QUuid uuid);
+    Q_INVOKABLE void runAll();
+    Q_INVOKABLE void reset();
 
     Q_INVOKABLE void fromJson(QJsonDocument doc);
     Q_INVOKABLE void open(QString path);
@@ -41,6 +43,7 @@ signals:
     void cellModelChanged();
     void saveError(QString message);
     void savePathChanged(QString savePath);
+    void saved();
 
 protected slots:
     void cellFinishedRunning(Cell *cell, RuntimeResult result);
@@ -57,6 +60,7 @@ protected:
     QThread *_rtThread;
     NbRuntime *_rt;
     QString _savePath = "";
+    bool _runningAll = false;
 };
 
 Q_DECLARE_METATYPE(Notebook)

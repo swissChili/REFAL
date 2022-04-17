@@ -18,14 +18,16 @@ SOURCES += \
     $$PWD/CellModel.cpp \
     $$PWD/IdeMain.cpp \
     $$PWD/NbRuntime.cpp \
-    $$PWD/Notebook.cpp
+    $$PWD/Notebook.cpp \
+    $$PWD/RecentModel.cpp
 
 HEADERS += \
     $$PWD/Cell.h \
     $$PWD/CellModel.h \
     $$PWD/IdeMain.h \
     $$PWD/NbRuntime.h \
-    $$PWD/Notebook.h
+    $$PWD/Notebook.h \
+    $$PWD/RecentModel.h
 
 RESOURCES += \
     $$PWD/resources.qrc

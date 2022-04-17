@@ -8,6 +8,7 @@ RowLayout {
     property string name: "Hello.refnb"
     property alias containsMouse: mouseArea.containsMouse
     signal clicked()
+    signal removeClicked()
 
     Image {
         id: nbIcon
@@ -27,7 +28,24 @@ RowLayout {
             anchors.fill: parent
             hoverEnabled: true
 
-            onClicked: root.clicked()
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+            onClicked: {
+                if (mouse.button == Qt.LeftButton)
+                    root.clicked();
+                else if (mouse.button == Qt.RightButton)
+                    contextMenu.popup();
+            }
+        }
+
+        Menu {
+            id: contextMenu
+
+            MenuItem {
+                text: qsTr("Remove")
+
+                onClicked: root.removeClicked()
+            }
         }
     }
 }

@@ -8,7 +8,8 @@ class VarContext
 {
 public:
     VarContext() = default;
-    VarContext(VarContext const &other)  noexcept;
+    VarContext(VarContext const &other) noexcept;
+    VarContext &operator =(const VarContext &other) = default;
 
     void add(char t, const QString &name, const Token &value);
     void add(char t, const QString &name, const QList<Token> &value);

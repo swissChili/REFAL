@@ -15,7 +15,8 @@ ApplicationWindow {
     Material.theme: Material.Light
     Material.accent: Material.Orange
 
-    minimumWidth: column.implicitWidth
+    minimumWidth: 600
+    minimumHeight: 400
 
     required property ApplicationWindow welcomeWindow
 
@@ -92,10 +93,14 @@ ApplicationWindow {
 
             Action {
                 text: qsTr("Run &All")
+
+                onTriggered: notebook.runAll();
             }
 
             Action {
                 text: qsTr("&Reset Runtime State")
+
+                onTriggered: notebook.reset();
             }
         }
     }
@@ -107,6 +112,8 @@ ApplicationWindow {
         {
             console.error(message)
         }
+
+        onSaved: welcomeWindow.recentModel.add(notebook.savePath)
     }
 
     ColumnLayout {
@@ -137,7 +144,7 @@ ApplicationWindow {
                         ColumnLayout {
                             Label {
                                 font.pointSize: 18
-                                text: qsTr("Notebook")
+                                text: notebook.savePath != "" ? notebook.savePath.split("/").pop().split(".").slice(0,-1).join('.') : qsTr("Notebook")
                             }
 
                             Label {

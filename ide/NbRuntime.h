@@ -16,6 +16,8 @@ class NbRuntime : public QObject
 public:
     explicit NbRuntime(QObject *parent = nullptr);
 
+    void reset();
+
 public slots:
     void queueCell(Cell *cell);
     void unqueueCell(Cell *cell);

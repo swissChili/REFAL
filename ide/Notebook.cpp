@@ -56,6 +56,21 @@ void Notebook::runCell(QUuid uuid)
 void Notebook::quitCell(QUuid uuid)
 {
     _rt->unqueueCell(Cell::cellFromUuid(uuid));
+    _runningAll = false;
+}
+
+void Notebook::runAll()
+{
+    if (_cells.size() > 0)
+    {
+        _rt->queueCell(_cells.first());
+        _runningAll = true;
+    }
+}
+
+void Notebook::reset()
+{
+    _rt->reset();
 }
 
 void Notebook::fromJson(QJsonDocument doc)
@@ -118,7 +133,7 @@ void Notebook::save()
 {
     if (_savePath == "")
     {
-        setSavePath(QFileDialog::getSaveFileName(nullptr, "Open Refal Notebook", "", "Refal Notebooks (*.refnb)"));
+        setSavePath(QFileDialog::getSaveFileName(nullptr, "Open REFAL Notebook", "", "REFAL Notebook (*.refnb)"));
     }
 
     QJsonDocument doc = toJson();
@@ -133,6 +148,8 @@ void Notebook::save()
 
     save.write(doc.toJson(QJsonDocument::Indented));
     save.close();
+
+    emit saved();
 }
 
 bool Notebook::savePathSet()
@@ -157,6 +174,21 @@ void Notebook::cellFinishedRunning(Cell *cell, RuntimeResult result)
     cell->setResult(pprint(result));
     cell->setStatus(Cell::IDLE);
     cell->setResultType(Cell::EXPRESSION);
+
+    if (_runningAll)
+    {
+        int index = _cells.indexOf(cell);
+
+        // not last
+        if (index < _cells.size() - 1)
+        {
+            _rt->queueCell(_cells[index + 1]);
+        }
+        else
+        {
+            _runningAll = false;
+        }
+    }
 }
 
 void Notebook::cellFailedToParse(Cell *cell, ParseResult result, Parser parser)
@@ -165,6 +197,8 @@ void Notebook::cellFailedToParse(Cell *cell, ParseResult result, Parser parser)
     cell->setResult(pprint(result, parser, PPrint::HTML));
     cell->setStatus(Cell::IDLE);
     cell->setResultType(Cell::DIAGNOSTIC);
+
+    _runningAll = false;
 }
 
 void Notebook::cellWaiting(Cell *cell)
@@ -184,4 +218,6 @@ void Notebook::cellQuit(Cell *cell)
     qInfo() << "cellQuit" << cell->uuid();
     cell->setResult("");
     cell->setStatus(Cell::IDLE);
+
+    _runningAll = false;
 }

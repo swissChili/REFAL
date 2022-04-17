@@ -1,0 +1,10 @@
+{
+    "cells": [
+        {
+            "code": "* These are examples from the book",
+            "result": "Garbage at end of input at 1:1<br>* These are examples from the book<br><font color=\"red\">^~~</font>",
+            "resultType": 1,
+            "status": 1
+        }
+    ]
+}

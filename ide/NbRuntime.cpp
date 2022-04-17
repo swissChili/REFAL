@@ -10,6 +10,12 @@ NbRuntime::NbRuntime(QObject *parent)
     StdLib().load(_eval);
 }
 
+void NbRuntime::reset()
+{
+    _eval.reset();
+    _ctx = {};
+}
+
 void NbRuntime::queueCell(Cell *cell)
 {
     if (!_cells.contains(cell))

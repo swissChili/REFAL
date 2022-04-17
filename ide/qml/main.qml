@@ -2,6 +2,9 @@ import QtQuick 2.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.0
 import QtQuick.Layouts 1.11
+import Qt.labs.settings 1.0
+
+import sh.swisschili.REFAL 1.0
 
 ApplicationWindow {
     id: root
@@ -19,6 +22,8 @@ ApplicationWindow {
 
     visible: true
 
+    property alias recentModel: recents
+
     function openNotebook(path=null) {
         let NbWindow = Qt.createComponent("qrc:///qml/NbWindow.qml");
         let window = NbWindow.createObject(null, {welcomeWindow: root});
@@ -34,6 +39,10 @@ ApplicationWindow {
             hide();
         else
             show();
+    }
+
+    RecentModel {
+        id: recents
     }
 
     Label {
@@ -125,21 +134,20 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
 
-                model: [
-                    // "~/Documents/Hello.refnb", "~/Downloads/stuff/Goodbye.refnb", "/home/ch/dev/REFAL/build/test.refnb"
-                ]
+                model: recents
 
                 delegate: RecentNotebook {
                     Layout.leftMargin: 8
                     Layout.rightMargin: 8
 
-                    name: modelData.split("/").pop()
+                    name: path.split("/").pop()
 
-                    ToolTip.text: modelData
+                    ToolTip.text: path
                     ToolTip.visible: containsMouse
                     ToolTip.delay: 1000
 
-                    onClicked: root.openNotebook(modelData)
+                    onClicked: root.openNotebook(path)
+                    onRemoveClicked: recents.remove(path)
                 }
             }
 

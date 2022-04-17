@@ -244,6 +244,13 @@ void Evaluator::quit()
     throw EvalQuitException();
 }
 
+void Evaluator::reset()
+{
+    _vars = {};
+    _functions = {};
+    _shouldContinue = true;
+}
+
 QList<Token> Evaluator::dig(QString name)
 {
     if (_vars.contains(name))
