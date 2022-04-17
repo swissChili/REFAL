@@ -8,7 +8,9 @@
 #include "Parser.h"
 #include "Evaluator.h"
 #include "VarContext.h"
+#ifdef INCLUDE_CLI
 #include "Repl.h"
+#endif
 #include "PPrint.h"
 
 #ifdef NO_IDE
@@ -308,11 +310,13 @@ int main(int argc, char *argv[])
 
         return testResults();
     }
+#ifdef INCLUDE_CLI
     else if (cli.isSet(replOption))
     {
         Repl repl;
         repl.start();
     }
+#endif
     else
     {
         return ideMain(&a);

@@ -13,8 +13,7 @@ SOURCES += \
 	main.cpp \
 	Matcher.cpp \
 	Parser.cpp \
-	PPrint.cpp \
-	Repl.cpp \
+        PPrint.cpp \
 	StdLib.cpp \
 	Token.cpp \
 	VarContext.cpp
@@ -25,11 +24,15 @@ HEADERS += \
 	Function.h \
 	Matcher.h \
 	Parser.h \
-	PPrint.h \
-	Repl.h \
+        PPrint.h \
 	StdLib.h \
 	Token.h \
 	VarContext.h
+
+includeCli {
+    SOURCES += Repl.cpp
+    HEADERS += Repl.h
+}
 
 include(ide/IDE.pri)
 
@@ -38,7 +41,10 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-LIBS += -lreadline
+includeCli {
+    LIBS += -lreadline
+    DEFINES += INCLUDE_CLI
+}
 
 TRANSLATIONS += $$files(ts/*.ts)
 RESOURCES += translations.qrc
