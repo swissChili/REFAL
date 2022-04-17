@@ -15,7 +15,6 @@ SOURCES += \
 	Parser.cpp \
         PPrint.cpp \
 	StdLib.cpp \
-	Token.cpp \
 	VarContext.cpp
 
 HEADERS += \

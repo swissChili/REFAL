@@ -5,7 +5,7 @@
 class AstNode : public TokenBase<AstNode>
 {
 public:
-    using TokenBase::TokenBase;
+    using TokenBase<AstNode>::TokenBase;
 
     AstNode(QString function, QList<AstNode> args);
 
