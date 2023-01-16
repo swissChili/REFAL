@@ -26,7 +26,7 @@ ApplicationWindow {
 
     function openNotebook(path=null) {
         let NbWindow = Qt.createComponent("qrc:///qml/NbWindow.qml");
-        let window = NbWindow.createObject(null, {welcomeWindow: root});
+        let window = NbWindow.createObject(root, {welcomeWindow: root});
 
         if (path !== null)
         {
