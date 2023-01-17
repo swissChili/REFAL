@@ -55,6 +55,7 @@ void Notebook::runCell(QUuid uuid)
 
 void Notebook::quitCell(QUuid uuid)
 {
+    qDebug() << "Quitting cell" << uuid;
     _rt->unqueueCell(Cell::cellFromUuid(uuid));
     _runningAll = false;
 }

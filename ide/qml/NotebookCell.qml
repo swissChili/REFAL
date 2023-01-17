@@ -19,6 +19,7 @@ Item {
     signal cellFocused()
     signal cellUnfocused()
     signal runClicked()
+    signal quitClicked()
     signal deleteClicked()
 
     height: column.height
@@ -61,13 +62,20 @@ Item {
 
                 RoundButton {
                     Layout.alignment: Qt.AlignTop
-                    icon.source: iconForState(root.state)
+                    icon.source: iconForState(root.status)
                     icon.color: Material.color(Material.Grey, Material.Shade600)
                     flat: true
 
-                    onClicked: root.runClicked()
+                    onClicked: {
+                        if (root.status == Cell.IDLE)
+                            root.runClicked()
+                        else if (root.status == Cell.RUNNING)
+                            root.quitClicked()
+                    }
 
                     function iconForState(state) {
+                        console.log("iconForState", state);
+
                         if (state === Cell.RUNNING)
                             return "qrc:///icons/square.svg"
 

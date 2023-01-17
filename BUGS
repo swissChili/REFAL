@@ -1,0 +1,1 @@
+Evaluator::quit(): throwing exceptions from event handlers is not supported in Qt. Need to manually keep track of some sort of evaluator state and quit when necessary.

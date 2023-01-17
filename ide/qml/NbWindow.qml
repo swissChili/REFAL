@@ -190,6 +190,10 @@ ApplicationWindow {
                         notebook.runCell(uuid)
                     }
 
+                    onQuitClicked: {
+                        notebook.quitCell(uuid)
+                    }
+
                     onCellFocused: {
                         codeEditor.currentIndex = index
                     }

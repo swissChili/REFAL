@@ -21,8 +21,6 @@ QString pprintDense(QList<T> val)
     QString out;
     int lastType = -1;
 
-    qInfo() << "pprint specialized";
-
     for (const T &v : val)
     {
         if ((lastType != v.type() || v.type() != T::SYM) && lastType != -1)

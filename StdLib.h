@@ -10,7 +10,7 @@ public:
 	void load(Evaluator &eval);
 
 private:
-	Function _print{"Print"},
+    Function _print{"Print"},
         _prout{"Prout"},
         _sleep{"Sleep"};
 };
